@@ -5101,7 +5101,6 @@ CMakeFiles/archmaster.dir/src/ui/AnalyticsView.cpp.o: /home/dev/manager/src/ui/A
   /usr/include/qt6/QtWidgets/QDialog \
   /usr/include/qt6/QtWidgets/QGraphicsView \
   /usr/include/qt6/QtWidgets/QGraphicsWidget \
-  /usr/include/qt6/QtWidgets/QGridLayout \
   /usr/include/qt6/QtWidgets/QGroupBox \
   /usr/include/qt6/QtWidgets/QHBoxLayout \
   /usr/include/qt6/QtWidgets/QHeaderView \
@@ -6249,7 +6248,6 @@ CMakeFiles/archmaster.dir/src/ui/ControlPanel.cpp.o: /home/dev/manager/src/ui/Co
   /usr/include/qt6/QtSql/qtsqlexports.h \
   /usr/include/qt6/QtSql/qtsqlglobal.h \
   /usr/include/qt6/QtWidgets/QDialog \
-  /usr/include/qt6/QtWidgets/QGridLayout \
   /usr/include/qt6/QtWidgets/QGroupBox \
   /usr/include/qt6/QtWidgets/QHBoxLayout \
   /usr/include/qt6/QtWidgets/QLabel \
@@ -7193,8 +7191,10 @@ CMakeFiles/archmaster.dir/src/ui/MainWindow.cpp.o: /home/dev/manager/src/ui/Main
   /usr/include/qt6/QtCharts/qpieslice.h \
   /usr/include/qt6/QtCharts/qtcharts-config.h \
   /usr/include/qt6/QtCharts/qtchartsexports.h \
+  /usr/include/qt6/QtCore/QCoreApplication \
   /usr/include/qt6/QtCore/QDateTime \
   /usr/include/qt6/QtCore/QDebug \
+  /usr/include/qt6/QtCore/QDir \
   /usr/include/qt6/QtCore/QFile \
   /usr/include/qt6/QtCore/QFlags \
   /usr/include/qt6/QtCore/QIODevice \
@@ -7662,6 +7662,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/bits/waitflags.h \
   /usr/include/bits/waitstatus.h \
   /usr/include/bits/wchar.h \
+  /usr/include/bits/wctype-wchar.h \
   /usr/include/bits/wordsize.h \
   /usr/include/bits/xopen_lim.h \
   /usr/include/c++/15.2.1/algorithm \
@@ -7677,11 +7678,14 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/bits/allocator.h \
   /usr/include/c++/15.2.1/bits/atomic_base.h \
   /usr/include/c++/15.2.1/bits/atomic_lockfree_defines.h \
+  /usr/include/c++/15.2.1/bits/basic_ios.h \
+  /usr/include/c++/15.2.1/bits/basic_ios.tcc \
   /usr/include/c++/15.2.1/bits/basic_string.h \
   /usr/include/c++/15.2.1/bits/basic_string.tcc \
   /usr/include/c++/15.2.1/bits/char_traits.h \
   /usr/include/c++/15.2.1/bits/charconv.h \
   /usr/include/c++/15.2.1/bits/chrono.h \
+  /usr/include/c++/15.2.1/bits/codecvt.h \
   /usr/include/c++/15.2.1/bits/concept_check.h \
   /usr/include/c++/15.2.1/bits/cpp_type_traits.h \
   /usr/include/c++/15.2.1/bits/cxxabi_forced.h \
@@ -7691,6 +7695,10 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/bits/exception.h \
   /usr/include/c++/15.2.1/bits/exception_defines.h \
   /usr/include/c++/15.2.1/bits/exception_ptr.h \
+  /usr/include/c++/15.2.1/bits/fs_dir.h \
+  /usr/include/c++/15.2.1/bits/fs_fwd.h \
+  /usr/include/c++/15.2.1/bits/fs_ops.h \
+  /usr/include/c++/15.2.1/bits/fs_path.h \
   /usr/include/c++/15.2.1/bits/functexcept.h \
   /usr/include/c++/15.2.1/bits/functional_hash.h \
   /usr/include/c++/15.2.1/bits/hash_bytes.h \
@@ -7698,9 +7706,15 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/bits/hashtable_policy.h \
   /usr/include/c++/15.2.1/bits/invoke.h \
   /usr/include/c++/15.2.1/bits/ios_base.h \
+  /usr/include/c++/15.2.1/bits/istream.tcc \
   /usr/include/c++/15.2.1/bits/list.tcc \
   /usr/include/c++/15.2.1/bits/locale_classes.h \
   /usr/include/c++/15.2.1/bits/locale_classes.tcc \
+  /usr/include/c++/15.2.1/bits/locale_conv.h \
+  /usr/include/c++/15.2.1/bits/locale_facets.h \
+  /usr/include/c++/15.2.1/bits/locale_facets.tcc \
+  /usr/include/c++/15.2.1/bits/locale_facets_nonio.h \
+  /usr/include/c++/15.2.1/bits/locale_facets_nonio.tcc \
   /usr/include/c++/15.2.1/bits/localefwd.h \
   /usr/include/c++/15.2.1/bits/memory_resource.h \
   /usr/include/c++/15.2.1/bits/memoryfwd.h \
@@ -7709,11 +7723,14 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/bits/nested_exception.h \
   /usr/include/c++/15.2.1/bits/new_allocator.h \
   /usr/include/c++/15.2.1/bits/node_handle.h \
+  /usr/include/c++/15.2.1/bits/ostream.h \
+  /usr/include/c++/15.2.1/bits/ostream.tcc \
   /usr/include/c++/15.2.1/bits/ostream_insert.h \
   /usr/include/c++/15.2.1/bits/parse_numbers.h \
   /usr/include/c++/15.2.1/bits/postypes.h \
   /usr/include/c++/15.2.1/bits/predefined_ops.h \
   /usr/include/c++/15.2.1/bits/ptr_traits.h \
+  /usr/include/c++/15.2.1/bits/quoted_string.h \
   /usr/include/c++/15.2.1/bits/range_access.h \
   /usr/include/c++/15.2.1/bits/refwrap.h \
   /usr/include/c++/15.2.1/bits/requires_hosted.h \
@@ -7721,6 +7738,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/bits/shared_ptr_atomic.h \
   /usr/include/c++/15.2.1/bits/shared_ptr_base.h \
   /usr/include/c++/15.2.1/bits/specfun.h \
+  /usr/include/c++/15.2.1/bits/sstream.tcc \
   /usr/include/c++/15.2.1/bits/std_abs.h \
   /usr/include/c++/15.2.1/bits/std_function.h \
   /usr/include/c++/15.2.1/bits/stl_algo.h \
@@ -7766,6 +7784,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/climits \
   /usr/include/c++/15.2.1/clocale \
   /usr/include/c++/15.2.1/cmath \
+  /usr/include/c++/15.2.1/codecvt \
   /usr/include/c++/15.2.1/compare \
   /usr/include/c++/15.2.1/concepts \
   /usr/include/c++/15.2.1/cstddef \
@@ -7775,6 +7794,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/cstring \
   /usr/include/c++/15.2.1/ctime \
   /usr/include/c++/15.2.1/cwchar \
+  /usr/include/c++/15.2.1/cwctype \
   /usr/include/c++/15.2.1/debug/assertions.h \
   /usr/include/c++/15.2.1/debug/debug.h \
   /usr/include/c++/15.2.1/exception \
@@ -7785,17 +7805,23 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/ext/numeric_traits.h \
   /usr/include/c++/15.2.1/ext/string_conversions.h \
   /usr/include/c++/15.2.1/ext/type_traits.h \
+  /usr/include/c++/15.2.1/filesystem \
   /usr/include/c++/15.2.1/functional \
   /usr/include/c++/15.2.1/initializer_list \
+  /usr/include/c++/15.2.1/iomanip \
+  /usr/include/c++/15.2.1/ios \
   /usr/include/c++/15.2.1/iosfwd \
+  /usr/include/c++/15.2.1/istream \
   /usr/include/c++/15.2.1/iterator \
   /usr/include/c++/15.2.1/limits \
   /usr/include/c++/15.2.1/list \
+  /usr/include/c++/15.2.1/locale \
   /usr/include/c++/15.2.1/map \
   /usr/include/c++/15.2.1/memory \
   /usr/include/c++/15.2.1/new \
   /usr/include/c++/15.2.1/numeric \
   /usr/include/c++/15.2.1/optional \
+  /usr/include/c++/15.2.1/ostream \
   /usr/include/c++/15.2.1/pstl/execution_defs.h \
   /usr/include/c++/15.2.1/pstl/glue_algorithm_defs.h \
   /usr/include/c++/15.2.1/pstl/glue_memory_defs.h \
@@ -7803,6 +7829,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/pstl/pstl_config.h \
   /usr/include/c++/15.2.1/ratio \
   /usr/include/c++/15.2.1/set \
+  /usr/include/c++/15.2.1/sstream \
   /usr/include/c++/15.2.1/stdexcept \
   /usr/include/c++/15.2.1/stdlib.h \
   /usr/include/c++/15.2.1/streambuf \
@@ -7835,10 +7862,14 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/c++locale.h \
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
+  /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/ctype_base.h \
+  /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/ctype_inline.h \
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/error_constants.h \
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/gthr-default.h \
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/gthr.h \
+  /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/messages_members.h \
   /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/os_defines.h \
+  /usr/include/c++/15.2.1/x86_64-pc-linux-gnu/bits/time_members.h \
   /usr/include/ctype.h \
   /usr/include/endian.h \
   /usr/include/errno.h \
@@ -7847,6 +7878,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
   /usr/include/inttypes.h \
+  /usr/include/libintl.h \
   /usr/include/limits.h \
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
@@ -7861,7 +7893,9 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/pthread.h \
   /usr/include/qt6/QtCore/QAbstractTableModel \
   /usr/include/qt6/QtCore/QDateTime \
+  /usr/include/qt6/QtCore/QDir \
   /usr/include/qt6/QtCore/QEventLoop \
+  /usr/include/qt6/QtCore/QFile \
   /usr/include/qt6/QtCore/QFlags \
   /usr/include/qt6/QtCore/QIODevice \
   /usr/include/qt6/QtCore/QJsonArray \
@@ -7931,9 +7965,14 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/qt6/QtCore/qdatetime.h \
   /usr/include/qt6/QtCore/qdeadlinetimer.h \
   /usr/include/qt6/QtCore/qdebug.h \
+  /usr/include/qt6/QtCore/qdir.h \
+  /usr/include/qt6/QtCore/qdirlisting.h \
   /usr/include/qt6/QtCore/qendian.h \
   /usr/include/qt6/QtCore/qeventloop.h \
   /usr/include/qt6/QtCore/qexceptionhandling.h \
+  /usr/include/qt6/QtCore/qfile.h \
+  /usr/include/qt6/QtCore/qfiledevice.h \
+  /usr/include/qt6/QtCore/qfileinfo.h \
   /usr/include/qt6/QtCore/qflags.h \
   /usr/include/qt6/QtCore/qfloat16.h \
   /usr/include/qt6/QtCore/qforeach.h \
@@ -8018,6 +8057,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/qt6/QtCore/qtenvironmentvariables.h \
   /usr/include/qt6/QtCore/qtextstream.h \
   /usr/include/qt6/QtCore/qtformat_impl.h \
+  /usr/include/qt6/QtCore/qtimezone.h \
   /usr/include/qt6/QtCore/qtmetamacros.h \
   /usr/include/qt6/QtCore/qtnoop.h \
   /usr/include/qt6/QtCore/qtpreprocessorsupport.h \
@@ -8102,6 +8142,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/qt6/QtWidgets/QApplication \
   /usr/include/qt6/QtWidgets/QComboBox \
   /usr/include/qt6/QtWidgets/QDialog \
+  /usr/include/qt6/QtWidgets/QFileDialog \
   /usr/include/qt6/QtWidgets/QGroupBox \
   /usr/include/qt6/QtWidgets/QHBoxLayout \
   /usr/include/qt6/QtWidgets/QHeaderView \
@@ -8130,6 +8171,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/qt6/QtWidgets/qcombobox.h \
   /usr/include/qt6/QtWidgets/qdialog.h \
   /usr/include/qt6/QtWidgets/qdialogbuttonbox.h \
+  /usr/include/qt6/QtWidgets/qfiledialog.h \
   /usr/include/qt6/QtWidgets/qframe.h \
   /usr/include/qt6/QtWidgets/qgridlayout.h \
   /usr/include/qt6/QtWidgets/qgroupbox.h \
@@ -8175,6 +8217,7 @@ CMakeFiles/archmaster.dir/src/ui/PackageView.cpp.o: /home/dev/manager/src/ui/Pac
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
+  /usr/include/wctype.h \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/limits.h \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/stdarg.h \
   /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include/stdbool.h \
@@ -9225,13 +9268,17 @@ CMakeFiles/archmaster.dir/src/ui/ProfileView.cpp.o: /home/dev/manager/src/ui/Pro
   /usr/include/qt6/QtGui/qvalidator.h \
   /usr/include/qt6/QtGui/qwindowdefs.h \
   /usr/include/qt6/QtWidgets/QDialog \
+  /usr/include/qt6/QtWidgets/QDialogButtonBox \
   /usr/include/qt6/QtWidgets/QFileDialog \
+  /usr/include/qt6/QtWidgets/QFormLayout \
   /usr/include/qt6/QtWidgets/QGroupBox \
   /usr/include/qt6/QtWidgets/QHBoxLayout \
   /usr/include/qt6/QtWidgets/QInputDialog \
   /usr/include/qt6/QtWidgets/QLabel \
+  /usr/include/qt6/QtWidgets/QLayout \
   /usr/include/qt6/QtWidgets/QLineEdit \
   /usr/include/qt6/QtWidgets/QListWidget \
+  /usr/include/qt6/QtWidgets/QMenu \
   /usr/include/qt6/QtWidgets/QMessageBox \
   /usr/include/qt6/QtWidgets/QProgressBar \
   /usr/include/qt6/QtWidgets/QPushButton \
@@ -9249,6 +9296,7 @@ CMakeFiles/archmaster.dir/src/ui/ProfileView.cpp.o: /home/dev/manager/src/ui/Pro
   /usr/include/qt6/QtWidgets/qdialog.h \
   /usr/include/qt6/QtWidgets/qdialogbuttonbox.h \
   /usr/include/qt6/QtWidgets/qfiledialog.h \
+  /usr/include/qt6/QtWidgets/qformlayout.h \
   /usr/include/qt6/QtWidgets/qframe.h \
   /usr/include/qt6/QtWidgets/qgridlayout.h \
   /usr/include/qt6/QtWidgets/qgroupbox.h \
@@ -9259,6 +9307,7 @@ CMakeFiles/archmaster.dir/src/ui/ProfileView.cpp.o: /home/dev/manager/src/ui/Pro
   /usr/include/qt6/QtWidgets/qlineedit.h \
   /usr/include/qt6/QtWidgets/qlistview.h \
   /usr/include/qt6/QtWidgets/qlistwidget.h \
+  /usr/include/qt6/QtWidgets/qmenu.h \
   /usr/include/qt6/QtWidgets/qmessagebox.h \
   /usr/include/qt6/QtWidgets/qprogressbar.h \
   /usr/include/qt6/QtWidgets/qpushbutton.h \
@@ -11261,6 +11310,10 @@ CMakeFiles/archmaster.dir/src/ui/ChartPopup.cpp.o:
 
 /home/dev/manager/src/ui/SearchView.cpp:
 
+/usr/include/qt6/QtWidgets/QMenu:
+
+/usr/include/qt6/QtWidgets/QLayout:
+
 CMakeFiles/archmaster.dir/src/ui/PrivilegedRunner.cpp.o:
 
 /home/dev/manager/src/ui/ProfileView.cpp:
@@ -11530,6 +11583,8 @@ CMakeFiles/archmaster.dir/src/ui/UpdateManager.cpp.o:
 /usr/include/qt6/QtWidgets/QProgressBar:
 
 /usr/include/qt6/QtWidgets/QMainWindow:
+
+/usr/include/qt6/QtWidgets/QFormLayout:
 
 /usr/include/qt6/QtWidgets/QLineEdit:
 
@@ -11971,6 +12026,8 @@ archmaster_autogen/M4YTXQ7V2H/moc_PackageListModel.cpp:
 
 /usr/include/c++/15.2.1/bits/invoke.h:
 
+/usr/include/qt6/QtWidgets/qmenu.h:
+
 /home/dev/manager/src/models/Package.h:
 
 CMakeFiles/archmaster.dir/src/models/Package.cpp.o:
@@ -12066,6 +12123,8 @@ archmaster_autogen/3YJK5W5UP7/qrc_resources.cpp:
 /usr/include/bits/types/struct_timespec.h:
 
 /usr/include/qt6/QtCore/qiterable.h:
+
+/usr/include/qt6/QtWidgets/qformlayout.h:
 
 archmaster_autogen/PRMOGMWJPH/moc_PackageManager.cpp:
 
@@ -12352,8 +12411,6 @@ CMakeFiles/archmaster.dir/src/core/AURClient.cpp.o:
 /usr/include/bits/long-double.h:
 
 /home/dev/manager/src/ui/LoadingOverlay.cpp:
-
-/usr/include/qt6/QtWidgets/QGridLayout:
 
 /usr/include/c++/15.2.1/bits/char_traits.h:
 

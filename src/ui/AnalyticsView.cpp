@@ -6,7 +6,6 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QGridLayout>
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QHeaderView>

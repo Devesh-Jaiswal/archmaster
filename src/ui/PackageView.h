@@ -42,6 +42,7 @@ private slots:
     void onRemovePackage();
     void onChangeVersion();
     void onTogglePin();
+    void onExportClicked();
     
 private:
     void setupUI();
@@ -88,6 +89,7 @@ private:
     QPushButton* m_removeBtn;
     QPushButton* m_versionBtn;
     QPushButton* m_pinBtn;
+    QPushButton* m_exportBtn;
     
     QString m_currentPackage;
 };

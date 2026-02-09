@@ -42,12 +42,16 @@ public:
     PackageProfile createFromInstalled() const;
     
 private:
+    QList<PackageProfile> m_userProfiles;
+    QList<PackageProfile> m_builtInProfiles;
+    QStringList m_removedBuiltInProfiles; // Names of built-in profiles that have been "deleted"
+    
+    QString profilesPath() const;
+    QString builtInProfilesPath() const; // For deleted built-ins persistence
     void loadProfiles();
     void initBuiltInProfiles();
-    QString profilesPath() const;
-    
-    QList<PackageProfile> m_builtInProfiles;
-    QList<PackageProfile> m_userProfiles;
+    void loadDeletedBuiltIns();
+    void saveDeletedBuiltIns();
 };
 
 #endif // PROFILEMANAGER_H

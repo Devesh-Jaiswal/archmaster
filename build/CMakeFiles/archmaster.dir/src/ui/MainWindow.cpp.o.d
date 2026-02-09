@@ -577,5 +577,4 @@ CMakeFiles/archmaster.dir/src/ui/MainWindow.cpp.o: \
  /usr/include/qt6/QtGui/QCloseEvent /usr/include/qt6/QtGui/qevent.h \
  /usr/include/qt6/QtWidgets/QStyle /usr/include/qt6/QtWidgets/qstyle.h \
  /usr/include/qt6/QtCore/QFile /usr/include/qt6/QtCore/qfile.h \
- /usr/include/qt6/QtCore/QDebug /usr/include/qt6/QtCore/qdebug.h \
  /usr/include/qt6/QtGui/QShortcut /usr/include/qt6/QtGui/qshortcut.h

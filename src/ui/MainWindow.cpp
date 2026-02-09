@@ -19,7 +19,6 @@
 #include <QCloseEvent>
 #include <QStyle>
 #include <QFile>
-#include <QDebug>
 #include <QShortcut>
 
 MainWindow::MainWindow(QWidget* parent)
@@ -127,13 +126,8 @@ void MainWindow::setupToolbar() {
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     m_toolbar->addWidget(spacer);
     
-    // Right side actions
-    QAction* exportAction = m_toolbar->addAction("📤 Export");
-    connect(exportAction, &QAction::triggered, this, &MainWindow::exportData);
-    
-    QAction* importAction = m_toolbar->addAction("📥 Import");
-    connect(importAction, &QAction::triggered, this, &MainWindow::importData);
-    
+    m_toolbar->addSeparator();
+
     m_toolbar->addSeparator();
     
     m_actionDarkMode = m_toolbar->addAction("🌙 Dark");
@@ -469,55 +463,39 @@ void MainWindow::applyTheme() {
 }
 
 void MainWindow::showAbout() {
+    QString shortcutsHtml = 
+        "<table border='0' cellspacing='5' cellpadding='2'>"
+        "<tr><td><b>Ctrl+1</b></td><td>Packages View</td></tr>"
+        "<tr><td><b>Ctrl+2</b></td><td>Analytics View</td></tr>"
+        "<tr><td><b>Ctrl+3</b></td><td>Control Panel</td></tr>"
+        "<tr><td><b>Ctrl+4</b></td><td>Updates</td></tr>"
+        "<tr><td><b>Ctrl+5</b></td><td>Profiles</td></tr>"
+        "<tr><td><b>Ctrl+F</b></td><td>Focus Search</td></tr>"
+        "<tr><td><b>Ctrl+R / F5</b></td><td>Refresh Packages</td></tr>"
+        "<tr><td><b>Ctrl+D</b></td><td>Toggle Dark Mode</td></tr>"
+        "<tr><td><b>Ctrl+Q</b></td><td>Quit</td></tr>"
+        "</table>";
+
     QMessageBox::about(this, "About ArchMaster",
         "<h2>ArchMaster</h2>"
-        "<p>Version 1.0.0</p>"
-        "<p>A modern package management dashboard for Arch Linux.</p>"
-        "<p>Built with Qt6 and libalpm.</p>"
+        "<p><b>Version 1.1.0</b></p>"
+        "<p>A modern, feature-rich package management dashboard for Arch Linux.</p>"
+        "<p>Built with Qt6, C++17, and libalpm.</p>"
         "<hr>"
-        "<p>Features:</p>"
+        "<h3>✨ New in v1.1</h3>"
         "<ul>"
-        "<li>📦 Package browsing with search and filters</li>"
-        "<li>📝 Personal notes and tagging</li>"
-        "<li>📊 Disk usage analytics</li>"
-        "<li>🔗 Dependency visualization</li>"
-        "<li>🌐 AUR integration</li>"
-        "</ul>");
+        "<li>📋 <b>Profiles:</b> Create, edit, and share package collections.</li>"
+        "<li>🔄 <b>Smart Restore:</b> Reset built-in profiles to defaults.</li>"
+        "<li>📦 <b>Partial Install:</b> Install specific packages from profiles.</li>"
+        "</ul>"
+        "<hr>"
+        "<h3>⌨️ Keyboard Shortcuts</h3>"
+        + shortcutsHtml +
+        "<hr>"
+        "<p>Developed for the Arch Linux Community.</p>");
 }
 
-void MainWindow::exportData() {
-    QString filePath = QFileDialog::getSaveFileName(this,
-        "Export Data", Config::instance()->exportPath() + "/archmaster_data.json",
-        "JSON Files (*.json)");
-    
-    if (!filePath.isEmpty()) {
-        if (m_database->exportToJson(filePath)) {
-            Config::instance()->setExportPath(QFileInfo(filePath).absolutePath());
-            QMessageBox::information(this, "Export Complete", 
-                "Data exported successfully to:\n" + filePath);
-        } else {
-            QMessageBox::warning(this, "Export Failed", 
-                "Failed to export data:\n" + m_database->lastError());
-        }
-    }
-}
 
-void MainWindow::importData() {
-    QString filePath = QFileDialog::getOpenFileName(this,
-        "Import Data", Config::instance()->exportPath(),
-        "JSON Files (*.json)");
-    
-    if (!filePath.isEmpty()) {
-        if (m_database->importFromJson(filePath)) {
-            QMessageBox::information(this, "Import Complete", 
-                "Data imported successfully!");
-            refreshPackages();
-        } else {
-            QMessageBox::warning(this, "Import Failed", 
-                "Failed to import data:\n" + m_database->lastError());
-        }
-    }
-}
 
 void MainWindow::showSettings() {
     // TODO: Settings dialog
@@ -568,6 +546,12 @@ void MainWindow::setupShortcuts() {
     QShortcut* shortcutControl = new QShortcut(QKeySequence("Ctrl+3"), this);
     connect(shortcutControl, &QShortcut::activated, this, &MainWindow::showControlPanel);
     
+    QShortcut* shortcutUpdates = new QShortcut(QKeySequence("Ctrl+4"), this);
+    connect(shortcutUpdates, &QShortcut::activated, this, &MainWindow::showUpdateManager);
+    
+    QShortcut* shortcutProfiles = new QShortcut(QKeySequence("Ctrl+5"), this);
+    connect(shortcutProfiles, &QShortcut::activated, this, &MainWindow::showProfileView);
+    
     // Action shortcuts
     QShortcut* shortcutRefresh = new QShortcut(QKeySequence("F5"), this);
     connect(shortcutRefresh, &QShortcut::activated, this, &MainWindow::refreshPackages);
@@ -582,12 +566,6 @@ void MainWindow::setupShortcuts() {
         toggleDarkMode();
     });
     
-    // Export/Import
-    QShortcut* shortcutExport = new QShortcut(QKeySequence("Ctrl+E"), this);
-    connect(shortcutExport, &QShortcut::activated, this, &MainWindow::exportData);
-    
-    QShortcut* shortcutImport = new QShortcut(QKeySequence("Ctrl+I"), this);
-    connect(shortcutImport, &QShortcut::activated, this, &MainWindow::importData);
     
     // Quit
     QShortcut* shortcutQuit = new QShortcut(QKeySequence("Ctrl+Q"), this);

@@ -44,10 +44,15 @@ template <> constexpr inline auto ProfileView::qt_create_metaobjectdata<qt_meta_
         "",
         "index",
         "onInstallClicked",
-        "onExportClicked",
         "onCreateClicked",
+        "onCreateCustomClicked",
+        "onEditClicked",
         "onDeleteClicked",
-        "onImportClicked"
+        "onImportClicked",
+        "onExportClicked",
+        "onPackageDoubleClicked",
+        "QListWidgetItem*",
+        "item"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -57,14 +62,22 @@ template <> constexpr inline auto ProfileView::qt_create_metaobjectdata<qt_meta_
         }}),
         // Slot 'onInstallClicked'
         QtMocHelpers::SlotData<void()>(4, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onExportClicked'
-        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'onCreateClicked'
+        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onCreateCustomClicked'
         QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onDeleteClicked'
+        // Slot 'onEditClicked'
         QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'onImportClicked'
+        // Slot 'onDeleteClicked'
         QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onImportClicked'
+        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onExportClicked'
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'onPackageDoubleClicked'
+        QtMocHelpers::SlotData<void(QListWidgetItem *)>(11, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 12, 13 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -90,10 +103,13 @@ void ProfileView::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         switch (_id) {
         case 0: _t->onProfileSelected((*reinterpret_cast<std::add_pointer_t<int>>(_a[1]))); break;
         case 1: _t->onInstallClicked(); break;
-        case 2: _t->onExportClicked(); break;
-        case 3: _t->onCreateClicked(); break;
-        case 4: _t->onDeleteClicked(); break;
-        case 5: _t->onImportClicked(); break;
+        case 2: _t->onCreateClicked(); break;
+        case 3: _t->onCreateCustomClicked(); break;
+        case 4: _t->onEditClicked(); break;
+        case 5: _t->onDeleteClicked(); break;
+        case 6: _t->onImportClicked(); break;
+        case 7: _t->onExportClicked(); break;
+        case 8: _t->onPackageDoubleClicked((*reinterpret_cast<std::add_pointer_t<QListWidgetItem*>>(_a[1]))); break;
         default: ;
         }
     }
@@ -118,14 +134,14 @@ int ProfileView::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 9;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 6)
+        if (_id < 9)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 6;
+        _id -= 9;
     }
     return _id;
 }

@@ -20,12 +20,12 @@ public:
 private slots:
     void onProfileSelected(int index);
     void onInstallClicked();
-    void onExportClicked();
     void onCreateClicked();
     void onCreateCustomClicked();
     void onEditClicked();
     void onDeleteClicked();
     void onImportClicked();
+    void onExportClicked();
     void onPackageDoubleClicked(QListWidgetItem* item);
     
 private:
@@ -40,14 +40,16 @@ private:
     QLabel* m_profileDescLabel;
     QListWidget* m_packageList;
     QPushButton* m_installBtn;
-    QPushButton* m_exportBtn;
     QPushButton* m_createBtn;
     QPushButton* m_createCustomBtn;
     QPushButton* m_editBtn;
     QPushButton* m_deleteBtn;
     QPushButton* m_importBtn;
+    QPushButton* m_exportBtn;
     
     QString m_selectedProfile;
+    
+    void showPackageDetails(const QString& pkgName);
 };
 
 #endif // PROFILEVIEW_H

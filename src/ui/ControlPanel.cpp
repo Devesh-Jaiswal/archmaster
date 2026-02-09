@@ -6,9 +6,7 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <QGridLayout>
 #include <QMessageBox>
-#include <QProcess>
 #include <QScrollArea>
 #include <QDir>
 #include <QDirIterator>

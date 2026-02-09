@@ -417,6 +417,9 @@ CMakeFiles/archmaster.dir/src/ui/ProfileView.cpp.o: \
  /usr/include/qt6/QtWidgets/qboxlayout.h \
  /usr/include/qt6/QtWidgets/qgridlayout.h \
  /usr/include/qt6/QtWidgets/QHBoxLayout \
+ /usr/include/qt6/QtWidgets/QFormLayout \
+ /usr/include/qt6/QtWidgets/qformlayout.h \
+ /usr/include/qt6/QtWidgets/QLayout /usr/include/qt6/QtWidgets/qlayout.h \
  /usr/include/qt6/QtWidgets/QGroupBox \
  /usr/include/qt6/QtWidgets/qgroupbox.h \
  /usr/include/qt6/QtWidgets/QSplitter \
@@ -460,4 +463,7 @@ CMakeFiles/archmaster.dir/src/ui/ProfileView.cpp.o: \
  /usr/include/qt6/QtCore/qfileinfo.h /usr/include/qt6/QtCore/qtimezone.h \
  /usr/include/qt6/QtCore/QFile /usr/include/qt6/QtCore/qfile.h \
  /usr/include/qt6/QtCore/QJsonDocument \
- /usr/include/qt6/QtCore/qjsondocument.h
+ /usr/include/qt6/QtCore/qjsondocument.h /usr/include/qt6/QtWidgets/QMenu \
+ /usr/include/qt6/QtWidgets/qmenu.h \
+ /usr/include/qt6/QtWidgets/QDialogButtonBox \
+ /usr/include/qt6/QtWidgets/qdialogbuttonbox.h

@@ -22,6 +22,13 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 #include <QProgressDialog>
+#include <QFileDialog>
+#include <QFile>
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+
 
 PackageView::PackageView(PackageManager* pm, Database* db, AURClient* aur, QWidget* parent)
     : QWidget(parent)
@@ -65,8 +72,26 @@ void PackageView::setupUI() {
     connect(m_filterCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), 
             this, &PackageView::onFilterChanged);
     
+    m_exportBtn = new QPushButton("💾 Export");
+    m_exportBtn->setToolTip("Export installed packages to JSON");
+    m_exportBtn->setStyleSheet(R"(
+        QPushButton {
+            background-color: #f9e2af;
+            color: #1e1e2e;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: #f5c2e7;
+        }
+    )");
+    connect(m_exportBtn, &QPushButton::clicked, this, &PackageView::onExportClicked);
+    
     searchLayout->addWidget(m_searchEdit, 1);
     searchLayout->addWidget(m_filterCombo);
+    searchLayout->addWidget(m_exportBtn);
     leftLayout->addLayout(searchLayout);
     
     // Table
@@ -724,5 +749,49 @@ void PackageView::onTogglePin() {
                     "Failed to pin package. Make sure you have the required permissions.");
             }
         }
+    }
+}
+
+void PackageView::onExportClicked() {
+    // Get all installed packages
+    QList<Package> packages = m_packageManager->getAllPackages();
+    QStringList installedPkgs;
+    
+    for (const Package& pkg : packages) {
+        // Only include explicitly installed packages
+        if (pkg.isExplicit()) {
+            installedPkgs.append(pkg.name);
+        }
+    }
+    
+    if (installedPkgs.isEmpty()) {
+        QMessageBox::warning(this, "Export Failed", "No explicitly installed packages found.");
+        return;
+    }
+    
+    QString filename = QFileDialog::getSaveFileName(this, "Export Packages",
+        QDir::homePath() + "/installed_packages.json",
+        "JSON Files (*.json)");
+    
+    if (filename.isEmpty()) return;
+    
+    // Create profile object for export
+    QJsonObject profileObj;
+    profileObj["name"] = "Exported Packages";
+    profileObj["description"] = QString("Exported from system on %1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    profileObj["packages"] = QJsonArray::fromStringList(installedPkgs);
+    
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(QJsonDocument(profileObj).toJson(QJsonDocument::Indented));
+        file.close();
+        
+        QMessageBox::information(this, "Export Successful",
+            QString("Successfully exported %1 explicit packages to:\n%2")
+                .arg(installedPkgs.size())
+                .arg(filename));
+    } else {
+        QMessageBox::warning(this, "Export Failed", 
+            QString("Failed to save file:\n%1").arg(file.errorString()));
     }
 }

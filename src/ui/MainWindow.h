@@ -41,8 +41,6 @@ private slots:
     void refreshPackages();
     void toggleDarkMode();
     void showAbout();
-    void exportData();
-    void importData();
     void showSettings();
     
     void onPackageSelected(const QString& packageName);

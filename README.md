@@ -1,267 +1,136 @@
-# ArchMaster 📦
+# ArchMaster 🚀
 
-A modern, feature-rich package management dashboard for Arch Linux, built with C++17 and Qt6.
+**The Ultimate Modern Package Manager Dashboard for Arch Linux.**
 
-![Qt6](https://img.shields.io/badge/Qt-6-41CD52?style=flat-square&logo=qt)
-![C++17](https://img.shields.io/badge/C++-17-00599C?style=flat-square&logo=cplusplus)
-![Arch Linux](https://img.shields.io/badge/Arch-Linux-1793D1?style=flat-square&logo=archlinux)
-![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+ArchMaster is a powerful, GUI-based package management solution designed to make managing your Arch Linux system intuitive, beautiful, and efficient. Built with C++ and Qt6, it leverages the speed of `libalpm` (Pacman) while offering advanced features found in no other manager.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-### 📦 Package Management
-- **Package Explorer** - Browse all installed packages with powerful search and filters
-- **Package Details** - View version, size, install date, dependencies, and required-by info
-- **Personal Notes & Tags** - Add notes and tags to remember why you installed packages
-- **Keep/Review Flags** - Mark packages as "Keep" (important) or "Review" (check later)
-- **Package Pinning** - Pin packages to prevent updates (adds to `IgnorePkg` in pacman.conf)
-- **Version Management** - Downgrade to previous versions via Arch Linux Archive
+### 📦 Advanced Package Management
+- **Instant Search**: Blazing fast search across thousands of packages.
+- **Smart Filters**: Quickly filter by `Installed`, `Upgrades`, `Orphans`, or view `All`.
+- **Visual Status Indicators**:
+    - ✅ **Installed**: Currently on your system.
+    - ⬇️ **Available**: Ready to download.
+    - ⚠️ **Orphan**: Unused dependencies that can be safely removed.
+- **Deep Inspection**: View detailed metadata, dependencies (with visual graphs), licenses, and more.
+- **One-Click Actions**: Install, Remove, or Upgrade packages with a single click.
 
-### 🔍 Search & Discovery
-- **Repository Search** - Search official repos with `pacman -Ss`
-- **AUR Integration** - Search and install AUR packages via yay/paru
-- **Find by File** - Search for packages that provide a specific file (`pacman -F`)
+### 📋 Intelligent Profile System
+*Manage your software collections like a pro.*
+- **Custom Profiles**: Create snapshots of your favorite software stacks (e.g., "Dev Tools", "Gaming").
+- **Built-in Profiles**: Includes curated sets for Web Dev, C++, Python, and more.
+- **Shadowing**: Edit any built-in profile to automatically create your own custom versions.
+- **Tombstoning**: Delete built-in profiles you don't use—they vanish from your list (but can be restored via config).
+- **Smart Restore**: Modified a built-in profile? The "Delete" button becomes "🔄 Reset" to restore the original.
+- **Partial Install**: Select specific packages in a profile (Ctrl+Click) to install just a subset.
+- **Import/Export**: Share your setups as JSON files. Perfect for syncing across machines.
 
-### 📊 Analytics Dashboard
-- **Quick Stats** - Total, Explicit, Dependencies, Orphans, Total Size
-- **Disk Usage Chart** - Pie chart showing explicit vs dependency disk usage
-- **Installation Timeline** - Monthly installation trends over the last 12 months
-- **Top 10 Largest Packages** - Quickly identify space hogs
-- **Orphan Packages** - List packages no longer required by anything
+### 📊 System Analytics & Health
+- **Storage Visualization**: Interactive charts showing disk usage by package.
+- **Distribution Stats**: Breakdown of Explicit vs. Dependency vs. Orphan packages.
+- **Cache Analysis**: See how much space old package versions are taking.
+- **Top Consumers**: Identify the largest packages installed on your system.
 
-### ⬆️ Update Manager
-- **Update Check** - Scan for available updates with `checkupdates`
-- **Security Flags** - Highlights security-related packages (linux, openssl, etc.)
-- **Major Version Alerts** - Warns about major version changes
-- **Selective Updates** - Choose which packages to update
-- **Update History** - View recent package operations from pacman.log
+### ⚙️ Control Center
+- **Maintenance Tools**:
+    - 🧹 **Clean Cache**: Free up disk space.
+    - 🗑️ **Remove Orphans**: Keep your system lean.
+    - 🌍 **Update Mirrors**: Refresh your mirror list for speed.
+- **Configuration**:
+    - Toggle Parallel Downloads.
+    - Enable 'Color' support in Pacman.
+    - View System Logs.
 
-### 📋 Package Profiles
-- **7 Built-in Profiles**:
-  - 🔧 Base Development (git, make, cmake, gcc, gdb, valgrind)
-  - 🐍 Python Development (python, pip, virtualenv, pytest, black)
-  - 🌐 Web Development (nodejs, npm, yarn, typescript, deno)
-  - 🦀 Rust Development (rust, cargo, rustfmt, rust-analyzer)
-  - ⚙️ C/C++ Development (gcc, clang, cmake, ninja, gdb, lldb)
-  - 🐳 Container & DevOps (docker, compose, kubectl, helm, terraform)
-  - 🗄️ Database Tools (postgresql, mariadb, sqlite, redis, mongodb)
-- **Custom Profiles** - Create profiles from your installed packages
-- **One-Click Install** - Install all packages in a profile at once
-- **Export/Import** - Save profiles as JSON for backup or sharing
+### 🔍 AUR Integration
+- Search and view packages from the Arch User Repository.
+- *Note: AUR helper integration (yay/paru) is detected automatically.*
 
-### ⚙️ Control Panel
-- **System Update** - Run `pacman -Syu` with privilege escalation
-- **Cache Cleaning** - Clean package cache with `pacman -Sc`
-- **Orphan Removal** - Select and remove orphan packages
-- **Secure Execution** - All privileged commands run via pkexec
-
-### 🎨 User Experience
-- **Dark Theme** - Beautiful Catppuccin-inspired dark mode
-- **Light Theme** - Clean light mode alternative
-- **Keyboard Shortcuts** - Ctrl+F for search, Ctrl+R to refresh
-- **Data Export/Import** - Backup your notes, tags, and settings
+### 🛡️ Secure & Modern
+- **Privileged Operations**: Uses Polkit for secure root actions (install/remove/update).
+- **Dark Mode**: Sleek, eye-friendly dark theme enabled by default (toggle with `Ctrl+D`).
+- **Responsive UI**: Adapts to your window size with smooth animations.
 
 ---
 
-## 📸 Screenshots
+## 📸 Gallery
 
-*Coming soon!*
+<div align="center">
+  <img src="docs/screenshots/260209_21h14m37s_screenshot.png" alt="Dashboard View" width="800"/>
+  <p><em>The Main Dashboard - Browsing Packages</em></p>
 
----
+  <img src="docs/screenshots/260209_21h16m47s_screenshot.png" alt="Profiles Management" width="800"/>
+  <p><em>System Analytics & Disk Usage</em></p>
 
-## 🛠️ Dependencies
+  <img src="docs/screenshots/260209_21h17m21s_screenshot.png" alt="Analytics View" width="800"/>
+  <p><em>Search Packages</em></p>
 
-Install the required packages on Arch Linux:
+  <img src="docs/screenshots/260209_21h18m28s_screenshot.png" alt="Control Panel" width="800"/>
+  <p><em>Package Installation History</em></p>
 
-```bash
-sudo pacman -S qt6-base qt6-charts qt6-svg cmake pkgconf base-devel
-```
+  <img src="docs/screenshots/260209_21h17m49s_screenshot.png" alt="Control Panel" width="800"/>
+  <p><em>Update Manager</em></p>
 
-**Optional** (for AUR support):
-```bash
-yay -S yay  # or paru
-```
+  <img src="docs/screenshots/260209_21h19m39s_screenshot.png" alt="Control Panel" width="800"/>
+  <p><em>Create Custom Profiles</em></p>
+</div>
 
----
-
-## 🏗️ Building
-
-```bash
-# Navigate to project directory
-cd ~/manager
-
-# Configure with CMake
-cmake -B build
-
-# Build the project
-cmake --build build
-
-# Run the application
-./build/bin/archmaster
-```
-
----
-
-## 📥 Installation
-
-After building, install as a system command and desktop app:
-
-```bash
-# Make launcher executable
-chmod +x /home/dev/manager/archmaster
-
-# Add to application menu (rofi/dmenu/desktop)
-cp /home/dev/manager/archmaster.desktop ~/.local/share/applications/
-
-# Create system-wide 'archmaster' command
-sudo ln -sf /home/dev/manager/build/bin/archmaster /usr/local/bin/archmaster
-```
-
-Now you can:
-- Run `archmaster` from any terminal
-- Search "ArchMaster" in rofi or your app launcher
-
----
-
-## 📁 Project Structure
-
-```
-archmaster/
-├── CMakeLists.txt              # Build configuration
-├── README.md                   # This file
-├── resources/                  # Icons and assets
-│   └── styles.qss              # Qt stylesheet
-└── src/
-    ├── main.cpp                # Application entry point
-    │
-    ├── core/                   # Backend Services
-    │   ├── PackageManager      # libalpm wrapper for package queries
-    │   ├── Database            # SQLite for user data (notes, tags, flags)
-    │   ├── AURClient           # AUR RPC API integration
-    │   ├── PacmanConfig        # Read/write IgnorePkg in pacman.conf
-    │   └── ProfileManager      # Package profile management
-    │
-    ├── models/                 # Data Models
-    │   ├── Package             # Package data structure
-    │   └── PackageListModel    # Qt model for package table
-    │
-    ├── ui/                     # User Interface Components
-    │   ├── MainWindow          # Main application window with toolbar
-    │   ├── PackageView         # Package list, details, and actions
-    │   ├── SearchView          # Repo/AUR/File search interface
-    │   ├── AnalyticsView       # Charts and statistics dashboard
-    │   ├── ControlPanel        # System operations panel
-    │   ├── UpdateManager       # Update checking and installation
-    │   ├── ProfileView         # Package profiles management
-    │   ├── PrivilegedRunner    # Secure sudo command execution
-    │   ├── ChartPopup          # Expanded chart view
-    │   └── LoadingOverlay      # Loading indicator
-    │
-    └── utils/                  # Utilities
-        └── Config              # Application settings persistence
-```
-
----
-
-## 🎯 Usage Guide
-
-### Package View (📦 Packages)
-| Action | Description |
-|--------|-------------|
-| Search | Type in search bar to filter packages |
-| Filter | Use dropdown: All, Explicit, Dependencies, Orphans, Keep, Review, Large |
-| Notes | Click a package, add notes in the right panel |
-| Tags | Add custom tags like "essential", "gaming", "work" |
-| Pin | Click "📌 Pin" to prevent a package from updating |
-| Version | Click "🔄 Change Version" to downgrade via Arch Archive |
-
-### Search View (🔍 Search)
-| Source | Description |
-|--------|-------------|
-| Repository | Search official Arch repos with `pacman -Ss` |
-| AUR | Search Arch User Repository (requires yay/paru) |
-| Find by File | Find which package provides a file (`pacman -F`) |
-
-### Analytics View (📊 Analytics)
-- View disk usage breakdown between explicit and dependency packages
-- See your installation timeline over the past year
-- Identify the largest packages consuming disk space
-- Find and clean up orphan packages
-
-### Updates View (⬆️ Updates)
-- Click "🔄 Check for Updates" to scan
-- 🔒 indicates security-related packages
-- ⚠️ indicates major version changes
-- Use checkboxes to select specific packages
-- Click "📜 History" to view recent package operations
-
-### Profiles View (📋 Profiles)
-- Select a built-in or custom profile
-- ✅ means package is installed, ⬇️ means missing
-- Click "⬇️ Install All Packages" to install missing ones
-- Click "➕ Create from System" to save your installed packages
-
----
-
-## 💾 Data Storage
-
-User data is stored in SQLite:
-```
-~/.local/share/ArchMaster/archmaster.db
-```
-
-Contains:
-- Personal notes for packages
-- Custom tags
-- Keep/Review flags
-- Application settings
-
-Custom profiles are stored in:
-```
-~/.local/share/ArchMaster/profiles.json
-```
-
----
 
 ## ⌨️ Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+F` | Focus search bar |
-| `Ctrl+R` | Refresh packages |
-| `Ctrl+1` | Switch to Packages view |
-| `Ctrl+2` | Switch to Analytics view |
-| `Ctrl+3` | Switch to Control Panel |
-| `Ctrl+4` | Switch to Search view |
-| `Ctrl+5` | Switch to Updates view |
+| **Navigation** | |
+| `Ctrl + 1` | Go to **Packages** |
+| `Ctrl + 2` | Go to **Analytics** |
+| `Ctrl + 3` | Go to **Control Panel** |
+| `Ctrl + 4` | Go to **Update Manager** |
+| `Ctrl + 5` | Go to **Profiles** |
+| **Actions** | |
+| `Ctrl + F` | **Focus Search** |
+| `Ctrl + R` / `F5` | **Refresh** Database |
+| `Ctrl + D` | Toggle **Dark Mode** |
+| `Ctrl + Q` | **Quit** App |
 
 ---
 
-## 🔐 Security
+## 🛠️ Installation
 
-- **No saved passwords** - Password is never stored
-- **pkexec for privileges** - Standard polkit authentication
-- **Direct commands** - Commands are executed directly, not through shell
+### Prerequisites
+ArchMaster is built for Arch Linux. You need the standard development tools and Qt6.
+
+```bash
+sudo pacman -S base-devel cmake qt6-base qt6-svg qt6-charts qt6-5compat
+```
+
+### Build Instructions
+
+1.  **Clone the Repo**:
+    ```bash
+    git clone https://github.com/yourusername/archmaster.git
+    cd archmaster
+    ```
+
+2.  **Compile**:
+    ```bash
+    cmake -B build
+    cmake --build build -j$(nproc)
+    ```
+
+3.  **Run**:
+    ```bash
+    ./build/bin/archmaster
+    ```
 
 ---
 
 ## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
----
+Found a bug? Want to add a feature?
+1.  Fork the repo.
+2.  Create a feature branch.
+3.  Submit a Pull Request.
 
 ## 📄 License
-
-MIT License - See [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [Qt Project](https://www.qt.io/) - UI framework
-- [libalpm](https://archlinux.org/pacman/libalpm.5.html) - Package management library
-- [Catppuccin](https://github.com/catppuccin/catppuccin) - Color palette inspiration
-- [Arch Linux](https://archlinux.org/) - The best distro 🐧
+This project is licensed under the MIT License - see the LICENSE file for details.
