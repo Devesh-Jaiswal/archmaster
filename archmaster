@@ -1,0 +1,6 @@
+#!/bin/bash
+# ArchMaster - Arch Linux Package Manager
+# Run from anywhere on the system
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$SCRIPT_DIR/build/bin/archmaster" "$@"

@@ -1,0 +1,13 @@
+{
+    "description": "C/C++ development tools",
+    "name": "⚙️ C/C++ Development",
+    "packages": [
+        "gcc",
+        "clang",
+        "cmake",
+        "ninja",
+        "gdb",
+        "lldb",
+        "clang-tools-extra"
+    ]
+}

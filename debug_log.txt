@@ -1,0 +1,3 @@
+PackageManager initialized successfully
+Database initialized at: "/home/dev/.local/share/ArchMaster/ArchMaster/archmaster.db"
+PackageManager initialized successfully
