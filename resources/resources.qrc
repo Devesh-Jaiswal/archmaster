@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/archmaster.svg</file>
+    </qresource>
+</RCC>
