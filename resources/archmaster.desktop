@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=ArchMaster
-Comment=Package Management Dashboard for Arch Linux
-Exec=archmaster
-Icon=archmaster
-Terminal=false
-Type=Application
-Categories=System;PackageManager;
-Keywords=pacman;package;manager;arch;linux;

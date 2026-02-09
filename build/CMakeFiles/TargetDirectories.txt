@@ -1,9 +1,0 @@
-/home/dev/manager/build/CMakeFiles/archmaster.dir
-/home/dev/manager/build/CMakeFiles/edit_cache.dir
-/home/dev/manager/build/CMakeFiles/rebuild_cache.dir
-/home/dev/manager/build/CMakeFiles/list_install_components.dir
-/home/dev/manager/build/CMakeFiles/install.dir
-/home/dev/manager/build/CMakeFiles/install/local.dir
-/home/dev/manager/build/CMakeFiles/install/strip.dir
-/home/dev/manager/build/CMakeFiles/archmaster_autogen_timestamp_deps.dir
-/home/dev/manager/build/CMakeFiles/archmaster_autogen.dir
