@@ -176,35 +176,40 @@ PackageFilterProxyModel::PackageFilterProxyModel(QObject* parent)
 void PackageFilterProxyModel::setFilterType(FilterType type) {
     if (m_filterType != type) {
         m_filterType = type;
-        invalidateRowsFilter();
+        beginFilterChange();
+        endFilterChange();
     }
 }
 
 void PackageFilterProxyModel::setSearchText(const QString& text) {
     if (m_searchText != text) {
         m_searchText = text;
-        invalidateRowsFilter();
+        beginFilterChange();
+        endFilterChange();
     }
 }
 
 void PackageFilterProxyModel::setTagFilter(const QString& tag) {
     if (m_tagFilter != tag) {
         m_tagFilter = tag;
-        invalidateRowsFilter();
+        beginFilterChange();
+        endFilterChange();
     }
 }
 
 void PackageFilterProxyModel::setMinSize(qint64 size) {
     if (m_minSize != size) {
         m_minSize = size;
-        invalidateRowsFilter();
+        beginFilterChange();
+        endFilterChange();
     }
 }
 
 void PackageFilterProxyModel::setMaxSize(qint64 size) {
     if (m_maxSize != size) {
         m_maxSize = size;
-        invalidateRowsFilter();
+        beginFilterChange();
+        endFilterChange();
     }
 }
 

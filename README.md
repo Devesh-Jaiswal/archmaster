@@ -99,13 +99,9 @@ ArchMaster is a powerful, GUI-based package management solution designed to make
 ## 🛠️ Installation
 
 ### Prerequisites
-ArchMaster is built for Arch Linux. You need the standard development tools and Qt6.
+ArchMaster is built for Arch Linux. The easiest way to install all prerequisites and build the project is using the provided scripts.
 
-```bash
-sudo pacman -S base-devel cmake qt6-base qt6-svg qt6-charts qt6-5compat
-```
-
-### Build Instructions
+### Build and Install
 
 1.  **Clone the Repo**:
     ```bash
@@ -113,16 +109,28 @@ sudo pacman -S base-devel cmake qt6-base qt6-svg qt6-charts qt6-5compat
     cd archmaster
     ```
 
-2.  **Compile**:
+2.  **Run Setup Script**:
+    The `setup.sh` script will automatically install missing dependencies (via `sudo pacman`) and build the project.
     ```bash
-    cmake -B build
-    cmake --build build -j$(nproc)
+    bash scripts/setup.sh
     ```
 
 3.  **Run**:
     ```bash
     ./build/bin/archmaster
     ```
+
+---
+
+### Manual Installation (Alternative)
+
+If you prefer to install dependencies manually:
+
+```bash
+sudo pacman -S base-devel cmake qt6-base qt6-svg qt6-charts qt6-5compat curl pkgconf
+cmake -B build
+cmake --build build -j$(nproc)
+```
 
 ---
 
