@@ -25,6 +25,8 @@ class PackageView : public QWidget {
 public:
     explicit PackageView(PackageManager* pm, Database* db, AURClient* aur, QWidget* parent = nullptr);
     
+    void applyTheme(bool isDark);
+    
     void loadPackages();
     
 signals:

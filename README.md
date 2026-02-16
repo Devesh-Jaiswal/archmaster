@@ -49,9 +49,11 @@ ArchMaster is a powerful, GUI-based package management solution designed to make
 - *Note: AUR helper integration (yay/paru) is detected automatically.*
 
 ### 🛡️ Secure & Modern
-- **Privileged Operations**: Uses Polkit for secure root actions (install/remove/update).
+- **Interactive Command Runner**: built-in terminal that handles password prompts, confirmations (Y/n), and interactive tools like `pacdiff` securely.
+- **Privileged Operations**: Uses `sudo` with a secure input channel for root actions.
 - **Dark Mode**: Sleek, eye-friendly dark theme enabled by default (toggle with `Ctrl+D`).
 - **Responsive UI**: Adapts to your window size with smooth animations.
+- **Background Health Check**: expensive operations run in the background to keep the UI snappy.
 
 ---
 
@@ -61,8 +63,6 @@ ArchMaster is a powerful, GUI-based package management solution designed to make
   <img src="docs/screenshots/260209_21h14m37s_screenshot.png" alt="Dashboard View" width="800"/>
   <p><em>The Main Dashboard - Browsing Packages</em></p>
 
-  <img src="docs/screenshots/260209_21h16m47s_screenshot.png" alt="Profiles Management" width="800"/>
-  <p><em>System Analytics & Disk Usage</em></p>
 
   <img src="docs/screenshots/260209_21h17m21s_screenshot.png" alt="Analytics View" width="800"/>
   <p><em>Search Packages</em></p>
@@ -71,7 +71,7 @@ ArchMaster is a powerful, GUI-based package management solution designed to make
   <p><em>Package Installation History</em></p>
 
   <img src="docs/screenshots/260209_21h17m49s_screenshot.png" alt="Control Panel" width="800"/>
-  <p><em>Update Manager</em></p>
+  <p><em>Update Manager with AUR Support</em></p>
 
   <img src="docs/screenshots/260209_21h19m39s_screenshot.png" alt="Control Panel" width="800"/>
   <p><em>Create Custom Profiles</em></p>
@@ -110,14 +110,15 @@ ArchMaster is built for Arch Linux. The easiest way to install all prerequisites
     ```
 
 2.  **Run Setup Script**:
-    The `setup.sh` script will automatically install missing dependencies (via `sudo pacman`) and build the project.
+    The `setup.sh` script will automatically install missing dependencies (via `sudo pacman`), build the project, and install it to `/usr/bin/`.
     ```bash
     bash scripts/setup.sh
     ```
 
 3.  **Run**:
+    You can launch it from your application menu or terminal:
     ```bash
-    ./build/bin/archmaster
+    archmaster
     ```
 
 ---
@@ -127,18 +128,10 @@ ArchMaster is built for Arch Linux. The easiest way to install all prerequisites
 If you prefer to install dependencies manually:
 
 ```bash
-sudo pacman -S base-devel cmake qt6-base qt6-svg qt6-charts qt6-5compat curl pkgconf
+sudo pacman -S --needed base-devel cmake git qt6-base qt6-svg qt6-charts qt6-5compat curl pkgconf pacman-contrib
 cmake -B build
 cmake --build build -j$(nproc)
+sudo cmake --install build --prefix /usr
 ```
 
 ---
-
-## 🤝 Contributing
-Found a bug? Want to add a feature?
-1.  Fork the repo.
-2.  Create a feature branch.
-3.  Submit a Pull Request.
-
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.

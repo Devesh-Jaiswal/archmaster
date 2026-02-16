@@ -19,6 +19,7 @@ struct UpdateInfo {
     QString changelog;
     bool isSecurityUpdate;
     bool isMajorUpdate;
+    bool isAUR;
     bool selected;
 };
 
@@ -28,6 +29,7 @@ class UpdateManager : public QWidget {
 public:
     explicit UpdateManager(PackageManager* pm, QWidget* parent = nullptr);
     
+    void applyTheme(bool isDark);
     void checkForUpdates();
     
 private slots:
@@ -43,6 +45,9 @@ private:
     void setupUI();
     void showUpdateDetails(int row);
     void parseChangelog(const QString& packageName);
+    void parseUpdatesOutput(const QString& output, bool isAUR);
+    void checkAURUpdates();
+    void finalizeUpdatesList();
     
     PackageManager* m_packageManager;
     

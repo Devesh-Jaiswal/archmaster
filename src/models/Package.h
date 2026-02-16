@@ -14,8 +14,8 @@ struct Package {
     QString packager;
     QString architecture;
     
-    qint64 installedSize;      // in bytes
-    qint64 downloadSize;       // in bytes
+    qint64 installedSize = 0;      // in bytes
+    qint64 downloadSize = 0;       // in bytes
     
     QDateTime installDate;
     QDateTime buildDate;

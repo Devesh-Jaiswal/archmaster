@@ -3,6 +3,7 @@
 #include "core/Database.h"
 #include "models/Package.h"
 #include "PrivilegedRunner.h"
+#include "utils/Config.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -11,6 +12,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
+#include <QTimer>
 
 ControlPanel::ControlPanel(PackageManager* pm, Database* db, QWidget* parent)
     : QWidget(parent)
@@ -18,7 +20,137 @@ ControlPanel::ControlPanel(PackageManager* pm, Database* db, QWidget* parent)
     , m_database(db)
 {
     setupUI();
+    // Apply initial theme
+    applyTheme(Config::instance()->darkMode());
     onRefreshOrphans();
+}
+
+void ControlPanel::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#1e1e2e" : "#eff1f5";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString groupBg = isDark ? "#181825" : "#e6e9ef";
+    QString borderColor = isDark ? "#45475a" : "#ccd0da";
+    QString warningBg = isDark ? "#45475a" : "#dce0e8";
+    QString buttonBg = isDark ? "#313244" : "#ccd0da";
+    QString buttonText = isDark ? "#cdd6f4" : "#4c4f69";
+    QString inputBg = isDark ? "#313244" : "#e6e9ef";
+    QString highlightColor = isDark ? "#89b4fa" : "#1e66f5";
+    QString redColor = isDark ? "#f38ba8" : "#d20f39";
+    QString greenColor = isDark ? "#a6e3a1" : "#40a02b";
+    
+    // Warning Label
+    QList<QLabel*> labels = this->findChildren<QLabel*>();
+    for(auto label : labels) {
+        if(label->text().contains("require root privileges")) {
+            label->setStyleSheet(QString("color: %1; padding: 10px; background-color: %2; border-radius: 8px;")
+                .arg(isDark ? "#f9e2af" : "#df8e1d", warningBg));
+        } else if (label == m_orphanSizeLabel) {
+            label->setStyleSheet(QString("font-weight: bold; color: %1;").arg(redColor));
+        }
+    }
+    
+    // Buttons helper
+    auto setBtnStyle = [isDark, buttonBg, buttonText](QPushButton* btn, QString bg = "", QString fg = "") {
+        if(!btn) return;
+        QString effectiveBg = bg.isEmpty() ? buttonBg : bg;
+        QString effectiveFg = fg.isEmpty() ? buttonText : fg;
+        
+        btn->setStyleSheet(QString(R"(
+            QPushButton {
+                padding: 10px 20px; 
+                font-size: 14px;
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 6px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(effectiveBg, effectiveFg, isDark ? "#585b70" : "#bcc0cc"));
+    };
+    
+    setBtnStyle(m_cleanCacheBtn);
+    setBtnStyle(m_syncDbBtn);
+    setBtnStyle(m_refreshKeysBtn);
+    setBtnStyle(m_refreshOrphansBtn);
+    
+    // Specific colored buttons
+    if(m_fixDbLockBtn) {
+        m_fixDbLockBtn->setStyleSheet(QString(
+            "QPushButton { padding: 10px 20px; font-size: 14px; background-color: #f9e2af; color: #1e1e2e; border-radius: 6px; font-weight: bold; }"
+            "QPushButton:hover { background-color: #df8e1d; }"
+        ));
+    }
+    
+    // Danger buttons
+    setBtnStyle(m_removeSelectedBtn, redColor, isDark ? "#1e1e2e" : "#ffffff");
+    setBtnStyle(m_removeOrphansBtn, redColor, isDark ? "#1e1e2e" : "#ffffff");
+        
+    // Output Text
+    if(m_outputText) {
+        m_outputText->setStyleSheet(QString(R"(
+            QTextEdit {
+                background-color: %1;
+                color: %2;
+                border: 2px solid %3;
+                border-radius: 8px;
+                padding: 8px;
+                font-family: monospace;
+            }
+        )").arg(inputBg, textColor, borderColor));
+    }
+    
+    // Group Boxes
+    QString groupStyle = QString(R"(
+        QGroupBox {
+            font-size: 16px;
+            font-weight: bold;
+            padding-top: 10px;
+            color: %1;
+            border: 2px solid %2;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 5px;
+        }
+    )").arg(textColor, borderColor);
+    
+    QList<QGroupBox*> groups = this->findChildren<QGroupBox*>();
+    for (QGroupBox* group : groups) {
+        group->setStyleSheet(groupStyle);
+    }
+    
+    // Orphans list
+    if (m_orphansList) {
+        m_orphansList->setStyleSheet(QString(R"(
+            QListWidget {
+                background-color: %1;
+                color: %2;
+                border: 2px solid %3;
+                border-radius: 8px;
+                font-size: 14px;
+            }
+            QListWidget::item {
+                padding: 5px 10px;
+            }
+            QListWidget::item:selected {
+                background-color: %4;
+                color: %5;
+            }
+            QListWidget::item:hover {
+                background-color: %6;
+            }
+        )").arg(
+            inputBg, textColor, borderColor,
+            highlightColor, isDark ? "#1e1e2e" : "#ffffff",
+            isDark ? "#45475a" : "#ccd0da"
+        ));
+    }
 }
 
 void ControlPanel::setupUI() {
@@ -40,29 +172,29 @@ void ControlPanel::setupUI() {
         "A terminal will open to execute the commands."
     );
     warningLabel->setWordWrap(true);
-    warningLabel->setStyleSheet("color: #f9e2af; padding: 10px; background-color: #45475a; border-radius: 8px;");
+    // Style applied by applyTheme
     sysLayout->addWidget(warningLabel);
     
     QHBoxLayout* sysButtonsLayout = new QHBoxLayout();
     
     m_cleanCacheBtn = new QPushButton("🧹 Clean Cache");
     m_cleanCacheBtn->setToolTip("Run: sudo pacman -Sc");
-    m_cleanCacheBtn->setStyleSheet("padding: 15px 30px; font-size: 14px;");
+    // Style applied by applyTheme
     connect(m_cleanCacheBtn, &QPushButton::clicked, this, &ControlPanel::onCleanCache);
     
     m_syncDbBtn = new QPushButton("📥 Sync Database");
     m_syncDbBtn->setToolTip("Run: sudo pacman -Sy");
-    m_syncDbBtn->setStyleSheet("padding: 15px 30px; font-size: 14px;");
+    // Style applied by applyTheme
     connect(m_syncDbBtn, &QPushButton::clicked, this, &ControlPanel::onSyncDatabase);
     
     m_refreshKeysBtn = new QPushButton("🔑 Refresh Keyrings");
     m_refreshKeysBtn->setToolTip("Refresh pacman keyring");
-    m_refreshKeysBtn->setStyleSheet("padding: 15px 30px; font-size: 14px;");
+    // Style applied by applyTheme
     connect(m_refreshKeysBtn, &QPushButton::clicked, this, &ControlPanel::onRefreshKeyrings);
     
     m_fixDbLockBtn = new QPushButton("🔓 Fix DB Lock");
     m_fixDbLockBtn->setToolTip("Remove /var/lib/pacman/db.lck");
-    m_fixDbLockBtn->setStyleSheet("padding: 15px 30px; font-size: 14px; background-color: #f9e2af; color: #1e1e2e;");
+    // Style applied by applyTheme
     connect(m_fixDbLockBtn, &QPushButton::clicked, this, &ControlPanel::onFixDbLock);
     
     sysButtonsLayout->addWidget(m_cleanCacheBtn);
@@ -82,15 +214,18 @@ void ControlPanel::setupUI() {
     cacheInfoLayout->addStretch();
     sysLayout->addLayout(cacheInfoLayout);
     
-    // Calculate cache size
-    QDir cacheDir("/var/cache/pacman/pkg");
-    qint64 cacheSize = 0;
-    QDirIterator it(cacheDir.absolutePath(), QDir::Files);
-    while (it.hasNext()) {
-        it.next();
-        cacheSize += it.fileInfo().size();
-    }
-    m_cacheSizeLabel->setText(QString("%1 GB").arg(cacheSize / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2));
+    // Defer cache size calculation to avoid blocking UI during startup
+    m_cacheSizeLabel->setText("Calculating...");
+    QTimer::singleShot(0, this, [this]() {
+        QDir cacheDir("/var/cache/pacman/pkg");
+        qint64 cacheSize = 0;
+        QDirIterator it(cacheDir.absolutePath(), QDir::Files);
+        while (it.hasNext()) {
+            it.next();
+            cacheSize += it.fileInfo().size();
+        }
+        m_cacheSizeLabel->setText(QString("%1 GB").arg(cacheSize / (1024.0 * 1024.0 * 1024.0), 0, 'f', 2));
+    });
     
     mainLayout->addWidget(sysGroup);
     
@@ -111,7 +246,7 @@ void ControlPanel::setupUI() {
     connect(m_refreshOrphansBtn, &QPushButton::clicked, this, &ControlPanel::onRefreshOrphans);
     
     m_orphanSizeLabel = new QLabel();
-    m_orphanSizeLabel->setStyleSheet("font-weight: bold; color: #f38ba8;");
+    // Style applied by applyTheme
     
     orphansTopLayout->addWidget(m_refreshOrphansBtn);
     orphansTopLayout->addWidget(m_orphanSizeLabel);
@@ -126,11 +261,9 @@ void ControlPanel::setupUI() {
     QHBoxLayout* orphanButtonsLayout = new QHBoxLayout();
     
     m_removeSelectedBtn = new QPushButton("🗑️ Remove Selected");
-    m_removeSelectedBtn->setStyleSheet("background-color: #f38ba8; color: #1e1e2e; padding: 10px 20px;");
     connect(m_removeSelectedBtn, &QPushButton::clicked, this, &ControlPanel::onRemoveSelected);
     
     m_removeOrphansBtn = new QPushButton("🗑️ Remove All Orphans");
-    m_removeOrphansBtn->setStyleSheet("background-color: #f38ba8; color: #1e1e2e; padding: 10px 20px;");
     connect(m_removeOrphansBtn, &QPushButton::clicked, this, &ControlPanel::onRemoveOrphans);
     
     orphanButtonsLayout->addWidget(m_removeSelectedBtn);
@@ -155,7 +288,7 @@ void ControlPanel::setupUI() {
     m_outputText = new QTextEdit();
     m_outputText->setReadOnly(true);
     m_outputText->setMinimumHeight(200);
-    m_outputText->setStyleSheet("font-family: monospace; font-size: 12px;");
+    // Style applied by applyTheme
     outputLayout->addWidget(m_outputText);
     
     mainLayout->addWidget(outputGroup);
@@ -223,9 +356,8 @@ void ControlPanel::onRemoveSelected() {
     
     QStringList names;
     for (QListWidgetItem* item : selected) {
-        QString text = item->text();
-        // Extract package name (before the size info)
-        QString name = text.split(" ").first();
+        // Extract package name from stored data
+        QString name = item->data(Qt::UserRole).toString();
         names << name;
     }
     
@@ -253,6 +385,7 @@ void ControlPanel::onRefreshOrphans() {
             .arg(pkg.formattedSize());
         
         QListWidgetItem* item = new QListWidgetItem(itemText);
+        item->setData(Qt::UserRole, pkg.name);
         
         // Mark keep packages differently
         if (m_database->isPackageMarkedKeep(pkg.name)) {

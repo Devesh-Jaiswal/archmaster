@@ -40,7 +40,132 @@ PackageView::PackageView(PackageManager* pm, Database* db, AURClient* aur, QWidg
     m_proxyModel = new PackageFilterProxyModel(this);
     m_proxyModel->setSourceModel(m_model);
     
+    m_proxyModel->setSourceModel(m_model);
+    
     setupUI();
+    // Apply initial theme based on config or default
+    applyTheme(true); 
+}
+
+void PackageView::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#1e1e2e" : "#eff1f5";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString borderColor = isDark ? "#45475a" : "#ccd0da";
+    QString inputBg = isDark ? "#313244" : "#e6e9ef";
+    QString headerColor = isDark ? "#89b4fa" : "#1e66f5";
+    QString subTextColor = isDark ? "#a6adc8" : "#6c6f85";
+    
+    // Search bar
+    m_searchEdit->setStyleSheet(QString(R"(
+        QLineEdit {
+            background-color: %1;
+            color: %2;
+            border: 2px solid %3;
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        QLineEdit:focus {
+            border: 2px solid %4;
+        }
+    )").arg(inputBg, textColor, borderColor, headerColor));
+    
+    // Filter combo
+    m_filterCombo->setStyleSheet(QString(R"(
+        QComboBox {
+            background-color: %1;
+            color: %2;
+            border: 2px solid %3;
+            border-radius: 8px;
+            padding: 8px;
+        }
+        QComboBox::drop-down {
+            border: none;
+        }
+    )").arg(inputBg, textColor, borderColor));
+    
+    // Table View
+    m_tableView->setStyleSheet(QString(R"(
+        QTableView {
+            background-color: %1;
+            alternate-background-color: %2;
+            color: %3;
+            border: 1px solid %4;
+            border-radius: 8px;
+            selection-background-color: %5;
+            selection-color: %6;
+            gridline-color: %4;
+        }
+        QHeaderView::section {
+            background-color: %2;
+            color: %3;
+            padding: 5px;
+            border: none;
+            border-bottom: 2px solid %4;
+            font-weight: bold;
+        }
+        QTableCornerButton::section {
+            background-color: %2;
+            border: none;
+            border-bottom: 2px solid %4;
+        }
+    )").arg(
+        bgColor, 
+        isDark ? "#313244" : "#e6e9ef", // Alt/Header
+        textColor, borderColor, 
+        isDark ? "#45475a" : "#bcc0cc", // Selection Bg
+        textColor  // Selection Text
+    ));
+            
+    // Labels
+    QString labelStyle = QString("font-size: 24px; font-weight: bold; color: %1;").arg(headerColor);
+    if(m_packageNameLabel) m_packageNameLabel->setStyleSheet(labelStyle);
+    
+    QString subLabelStyle = QString("font-size: 14px; color: %1;").arg(subTextColor);
+    if(m_packageVersionLabel) m_packageVersionLabel->setStyleSheet(subLabelStyle + " font-weight: bold;");
+    if(m_packageSizeLabel) m_packageSizeLabel->setStyleSheet(subLabelStyle);
+    if(m_packageDateLabel) m_packageDateLabel->setStyleSheet(subLabelStyle);
+    if(m_packageReasonLabel) m_packageReasonLabel->setStyleSheet(subLabelStyle);
+    if(m_packageDescLabel) m_packageDescLabel->setStyleSheet(QString("font-size: 14px; color: %1; margin-top: 10px;").arg(textColor));
+    
+    // Headers
+    QString sectionHeaderStyle = QString("font-size: 16px; font-weight: bold; color: %1; margin-top: 15px;").arg(headerColor);
+    if(m_dependsLabel) m_dependsLabel->setStyleSheet(sectionHeaderStyle);
+    if(m_requiredByLabel) m_requiredByLabel->setStyleSheet(sectionHeaderStyle);
+    
+    // Text Edits / Lists
+    QString boxStyle = QString(R"(
+        background-color: %1;
+        color: %2;
+        border: 1px solid %3;
+        border-radius: 6px;
+        padding: 5px;
+    )").arg(inputBg, textColor, borderColor);
+    
+    if(m_notesEdit) m_notesEdit->setStyleSheet(boxStyle);
+    if(m_tagsList) m_tagsList->setStyleSheet(boxStyle);
+    if(m_tagInput) m_tagInput->setStyleSheet(boxStyle);
+    
+    // Update Export Button too since it has a specific color
+    if(m_exportBtn) {
+         m_exportBtn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 6px;
+                padding: 5px 10px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(
+            isDark ? "#f9e2af" : "#df8e1d", // Yellow
+            isDark ? "#1e1e2e" : "#ffffff", 
+            isDark ? "#f5c2e7" : "#ea76cb" // Pinkish/Orange highlight
+        ));
+    }
 }
 
 void PackageView::setupUI() {
@@ -464,7 +589,7 @@ void PackageView::onRemovePackage() {
     
     if (reply == QMessageBox::Yes) {
         bool success = PrivilegedRunner::runCommand(
-            QString("pacman -Rs %1 --noconfirm").arg(m_currentPackage),
+            QString("pacman -Rs %1").arg(m_currentPackage),
             QString("Removing package: %1").arg(m_currentPackage),
             this);
         
@@ -523,7 +648,7 @@ void PackageView::onChangeVersion() {
             }
             
             bool success = PrivilegedRunner::runCommand(
-                QString("%1 -S %2 --noconfirm").arg(aurHelper).arg(m_currentPackage),
+                QString("%1 -S %2").arg(aurHelper).arg(m_currentPackage),
                 QString("Reinstalling AUR package: %1").arg(m_currentPackage),
                 this);
             
@@ -645,7 +770,7 @@ void PackageView::onChangeVersion() {
     if (choice.startsWith("⟳")) {
         // Reinstall current
         bool success = PrivilegedRunner::runCommand(
-            QString("pacman -S %1 --noconfirm").arg(m_currentPackage),
+            QString("pacman -S %1").arg(m_currentPackage),
             QString("Reinstalling package: %1").arg(m_currentPackage),
             this);
         
@@ -669,7 +794,7 @@ void PackageView::onChangeVersion() {
             .arg(urlVersion);
         
         bool success = PrivilegedRunner::runCommand(
-            QString("pacman -U \"%1\" --noconfirm").arg(pkgUrl),
+            QString("pacman -U \"%1\"").arg(pkgUrl),
             QString("Installing %1 version %2").arg(m_currentPackage).arg(selectedVersion),
             this);
         
@@ -681,7 +806,7 @@ void PackageView::onChangeVersion() {
                 .arg(urlVersion);
             
             success = PrivilegedRunner::runCommand(
-                QString("pacman -U \"%1\" --noconfirm").arg(pkgUrl),
+                QString("pacman -U \"%1\"").arg(pkgUrl),
                 QString("Installing %1 version %2").arg(m_currentPackage).arg(selectedVersion),
                 this);
         }

@@ -17,6 +17,7 @@ class ControlPanel : public QWidget {
     
 public:
     explicit ControlPanel(PackageManager* pm, Database* db, QWidget* parent = nullptr);
+    void applyTheme(bool isDark);
     
 private slots:
     void onCleanCache();

@@ -28,5 +28,9 @@ cd "$PROJECT_ROOT"
 cmake -B build -S .
 cmake --build build -j$(nproc)
 
-echo -e "\n${GREEN}==>${NC} Build complete! You can run the application with:"
-echo -e "./build/bin/archmaster"
+# 3. Install the application
+echo -e "${GREEN}==>${NC} Installing ArchMaster to /usr/bin/..."
+sudo cmake --install build --prefix /usr
+
+echo -e "\n${GREEN}==>${NC} Build and installation complete!"
+echo -e "You can run the application with: archmaster"

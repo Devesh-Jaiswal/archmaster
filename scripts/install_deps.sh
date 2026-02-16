@@ -25,19 +25,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # 3. Update package database
-echo -e "${GREEN}==>${NC} Updating package database..."
-pacman -Sy
-
-# 4. Install dependencies
-# List of dependencies:
-# - base-devel: Standard build tools (gcc, make, etc.)
-# - cmake: Build system
-# - qt6-base, qt6-svg, qt6-charts, qt6-5compat: Qt6 libraries
-# - curl: Network operations
-# - pkgconf: Package configuration
-# - alpm: Arch Linux Package Manager library (usually part of pacman, but good to ensure header availability)
-
-echo -e "${GREEN}==>${NC} Installing dependencies..."
-pacman -S --needed --noconfirm base-devel cmake qt6-base qt6-svg qt6-charts qt6-5compat curl pkgconf vulkan-headers
+echo -e "${GREEN}==>${NC} Updating package database and installing dependencies..."
+pacman -Sy --needed --noconfirm base-devel cmake git qt6-base qt6-svg qt6-charts qt6-5compat curl pkgconf vulkan-headers pacman-contrib
 
 echo -e "${GREEN}==>${NC} Dependencies installed successfully!"

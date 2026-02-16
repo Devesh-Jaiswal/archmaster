@@ -127,8 +127,6 @@ void MainWindow::setupToolbar() {
     m_toolbar->addWidget(spacer);
     
     m_toolbar->addSeparator();
-
-    m_toolbar->addSeparator();
     
     m_actionDarkMode = m_toolbar->addAction("🌙 Dark");
     m_actionDarkMode->setCheckable(true);
@@ -155,8 +153,8 @@ void MainWindow::setupConnections() {
     connect(m_packageView, &PackageView::packageSelected, 
             this, &MainWindow::onPackageSelected);
     
-    connect(m_packageManager.get(), &PackageManager::packagesChanged,
-            this, &MainWindow::refreshPackages);
+    // NOTE: Do NOT connect packagesChanged to refreshPackages — it creates 
+    // an infinite loop: refreshPackages → loadPackages → setPackages → packagesChanged → ...
     
     connect(m_packageManager.get(), &PackageManager::operationProgress,
             this, [this](const QString& msg, int percent) {
@@ -256,7 +254,13 @@ void MainWindow::refreshPackages() {
 }
 
 void MainWindow::toggleDarkMode() {
-    Config::instance()->setDarkMode(m_actionDarkMode->isChecked());
+    bool isDark = m_actionDarkMode->isChecked();
+    
+    // Update config
+    Config::instance()->setDarkMode(isDark);
+    
+    // Apply theme
+    applyTheme();
 }
 
 void MainWindow::applyTheme() {
@@ -460,6 +464,18 @@ void MainWindow::applyTheme() {
     
     m_actionDarkMode->setText(dark ? "🌙 Dark" : "☀️ Light");
     m_actionDarkMode->setChecked(dark);
+    
+    // Apply theme to child views
+    applyThemeToViews(dark);
+}
+
+void MainWindow::applyThemeToViews(bool isDark) {
+    if (m_packageView) m_packageView->applyTheme(isDark);
+    if (m_analyticsView) m_analyticsView->applyTheme(isDark);
+    if (m_controlPanel) m_controlPanel->applyTheme(isDark);
+    if (m_searchView) m_searchView->applyTheme(isDark);
+    if (m_updateManager) m_updateManager->applyTheme(isDark);
+    if (m_profileView) m_profileView->applyTheme(isDark);
 }
 
 void MainWindow::showAbout() {
@@ -478,7 +494,7 @@ void MainWindow::showAbout() {
 
     QMessageBox::about(this, "About ArchMaster",
         "<h2>ArchMaster</h2>"
-        "<p><b>Version 1.1.0</b></p>"
+        "<p><b>Version 1.0.0</b></p>"
         "<p>A modern, feature-rich package management dashboard for Arch Linux.</p>"
         "<p>Built with Qt6, C++17, and libalpm.</p>"
         "<hr>"

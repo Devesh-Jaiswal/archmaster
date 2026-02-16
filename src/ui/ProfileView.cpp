@@ -26,6 +26,143 @@ ProfileView::ProfileView(ProfileManager* pm, PackageManager* pkgMgr, QWidget* pa
     refreshProfiles();
 }
 
+void ProfileView::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#1e1e2e" : "#eff1f5";
+    QString listBg = isDark ? "#313244" : "#e6e9ef";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString subTextColor = isDark ? "#a6adc8" : "#6c6f85";
+    QString borderColor = isDark ? "#45475a" : "#ccd0da";
+    QString highlightColor = isDark ? "#89b4fa" : "#1e66f5";
+    QString headerColor = isDark ? "#cdd6f4" : "#4c4f69";
+    
+    // Header Labels
+    QList<QLabel*> labels = findChildren<QLabel*>();
+    for(auto label : labels) {
+         if(label->text().contains("Package Profiles")) {
+              label->setStyleSheet(QString("font-size: 24px; font-weight: bold; color: %1;").arg(textColor));
+         } else if(label->text().contains("Save and restore")) {
+              label->setStyleSheet(QString("color: %1; margin-bottom: 10px;").arg(subTextColor));
+         } else if(label == m_profileNameLabel) {
+             // Keeps its own color (blueish) usually
+              label->setStyleSheet(QString("font-size: 18px; font-weight: bold; color: %1;").arg(highlightColor));
+         } else if(label == m_profileDescLabel) {
+              label->setStyleSheet(QString("color: %1; margin-bottom: 10px;").arg(subTextColor));
+         } else if(label->text().contains("Packages in this profile")) {
+              label->setStyleSheet(QString("color: %1; font-weight: bold;").arg(textColor));
+         }
+    }
+    
+    // Lists
+    QString listStyle = QString(R"(
+        QListWidget {
+            background-color: %1;
+            border: 1px solid %2;
+            border-radius: 8px;
+            color: %3;
+            font-size: 14px;
+        }
+        QListWidget::item {
+            padding: 10px;
+            border-bottom: 1px solid %2;
+        }
+        QListWidget::item:selected {
+            background-color: %4;
+            color: %5;
+        }
+        QListWidget::item:hover {
+            background-color: %6;
+        }
+    )").arg(listBg, borderColor, textColor, highlightColor, isDark ? "#1e1e2e" : "#ffffff", isDark ? "#45475a" : "#bcc0cc");
+    
+    if(m_profileList) m_profileList->setStyleSheet(listStyle);
+    
+    if(m_packageList) {
+        m_packageList->setStyleSheet(QString(R"(
+            QListWidget {
+                background-color: %1;
+                border: 1px solid %2;
+                border-radius: 8px;
+                color: %3;
+            }
+            QListWidget::item {
+                padding: 5px;
+            }
+            QListWidget::item:hover {
+                background-color: %4;
+            }
+            QListWidget::item:selected {
+                background-color: %5;
+                color: %3;
+            }
+        )").arg(
+            isDark ? "#1e1e2e" : "#eff1f5", // Different bg for package list?
+            borderColor, textColor, 
+            isDark ? "#45475a" : "#bcc0cc",
+            isDark ? "#585b70" : "#9ca0b0"
+        ));
+    }
+
+    // Buttons helper
+    auto setBtnStyle = [isDark](QPushButton* btn, QString color, QString hoverColor) {
+        if(!btn) return;
+        btn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 12px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(color, isDark ? "#1e1e2e" : "#ffffff", hoverColor));
+    };
+
+    setBtnStyle(m_createBtn, isDark ? "#a6e3a1" : "#40a02b", isDark ? "#94e2d5" : "#179299"); // Green
+    setBtnStyle(m_deleteBtn, isDark ? "#f38ba8" : "#d20f39", isDark ? "#eba0ac" : "#e64553"); // Red
+    setBtnStyle(m_createCustomBtn, isDark ? "#f9e2af" : "#df8e1d", isDark ? "#f5c2e7" : "#ea76cb"); // Yellow/Pink?
+    setBtnStyle(m_editBtn, isDark ? "#cba6f7" : "#8839ef", isDark ? "#f5c2e7" : "#ea76cb"); // Purple
+    setBtnStyle(m_importBtn, highlightColor, isDark ? "#b4befe" : "#7287fd"); // Blue
+    setBtnStyle(m_exportBtn, isDark ? "#f9e2af" : "#df8e1d", isDark ? "#f5c2e7" : "#ea76cb"); // Yellow
+    
+    // Install btn has bigger padding
+    if(m_installBtn) {
+        m_installBtn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 8px;
+                padding: 12px 20px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(highlightColor, isDark ? "#1e1e2e" : "#ffffff", isDark ? "#b4befe" : "#7287fd"));
+    }
+    
+    // Group Boxes
+    setStyleSheet(QString(R"(
+        QGroupBox {
+            font-weight: bold;
+            color: %1;
+            border: 1px solid %2;
+            border-radius: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 5px;
+        }
+    )").arg(highlightColor, borderColor));
+}
+
 void ProfileView::setupUI() {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setSpacing(15);
@@ -33,11 +170,11 @@ void ProfileView::setupUI() {
     
     // Header
     QLabel* headerLabel = new QLabel("📋 Package Profiles");
-    headerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #cdd6f4;");
+    // Style applied by applyTheme
     mainLayout->addWidget(headerLabel);
     
     QLabel* subLabel = new QLabel("Save and restore package configurations for quick environment setup");
-    subLabel->setStyleSheet("color: #a6adc8; margin-bottom: 10px;");
+    // Style applied by applyTheme // subLabel->setStyleSheet("color: #a6adc8; margin-bottom: 10px;");
     mainLayout->addWidget(subLabel);
     
     // Main content splitter
@@ -48,26 +185,7 @@ void ProfileView::setupUI() {
     QVBoxLayout* profileLayout = new QVBoxLayout(profileGroup);
     
     m_profileList = new QListWidget();
-    m_profileList->setStyleSheet(R"(
-        QListWidget {
-            background-color: #313244;
-            border: 1px solid #45475a;
-            border-radius: 8px;
-            color: #cdd6f4;
-            font-size: 14px;
-        }
-        QListWidget::item {
-            padding: 10px;
-            border-bottom: 1px solid #45475a;
-        }
-        QListWidget::item:selected {
-            background-color: #89b4fa;
-            color: #1e1e2e;
-        }
-        QListWidget::item:hover {
-            background-color: #45475a;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_profileList, &QListWidget::currentRowChanged, this, &ProfileView::onProfileSelected);
     profileLayout->addWidget(m_profileList);
     
@@ -75,67 +193,19 @@ void ProfileView::setupUI() {
     QHBoxLayout* profileBtnLayout = new QHBoxLayout();
     
     m_createBtn = new QPushButton("➕ Create from System");
-    m_createBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #a6e3a1;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #94e2d5;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_createBtn, &QPushButton::clicked, this, &ProfileView::onCreateClicked);
     
     m_deleteBtn = new QPushButton("🗑️ Delete");
-    m_deleteBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #f38ba8;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #eba0ac;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_deleteBtn, &QPushButton::clicked, this, &ProfileView::onDeleteClicked);
     
     m_createCustomBtn = new QPushButton("✨ Create Custom");
-    m_createCustomBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #f9e2af;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #f5c2e7;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_createCustomBtn, &QPushButton::clicked, this, &ProfileView::onCreateCustomClicked);
     
     m_editBtn = new QPushButton("✏️ Edit");
-    m_editBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #cba6f7;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #f5c2e7;
-        }
-    )");
+    // Style applied by applyTheme
     m_editBtn->setEnabled(false);
     connect(m_editBtn, &QPushButton::clicked, this, &ProfileView::onEditClicked);
     
@@ -148,36 +218,12 @@ void ProfileView::setupUI() {
     QHBoxLayout* profileBtnLayout2 = new QHBoxLayout();
     
     m_importBtn = new QPushButton("📥 Import");
-    m_importBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #89b4fa;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #b4befe;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_importBtn, &QPushButton::clicked, this, &ProfileView::onImportClicked);
     
     m_exportBtn = new QPushButton("📤 Export");
     m_exportBtn->setToolTip("Export selected profile");
-    m_exportBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #f9e2af;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #f5c2e7;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_exportBtn, &QPushButton::clicked, this, &ProfileView::onExportClicked);
     
     profileBtnLayout2->addWidget(m_editBtn);
@@ -193,38 +239,24 @@ void ProfileView::setupUI() {
     QVBoxLayout* detailsLayout = new QVBoxLayout(detailsGroup);
     
     m_profileNameLabel = new QLabel("Select a profile");
-    m_profileNameLabel->setStyleSheet("font-size: 18px; font-weight: bold; color: #89b4fa;");
+    // Style applied by applyTheme
     detailsLayout->addWidget(m_profileNameLabel);
     
     m_profileDescLabel = new QLabel("");
-    m_profileDescLabel->setStyleSheet("color: #a6adc8; margin-bottom: 10px;");
+    // Style applied by applyTheme
     m_profileDescLabel->setWordWrap(true);
     detailsLayout->addWidget(m_profileDescLabel);
     
     QLabel* pkgLabel = new QLabel("📦 Packages in this profile (Select to install specific):");
-    pkgLabel->setStyleSheet("color: #cdd6f4; font-weight: bold;");
+    // Style applied by applyTheme
     detailsLayout->addWidget(pkgLabel);
     
     m_packageList = new QListWidget();
     m_packageList->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    m_packageList->setStyleSheet(R"(
-        QListWidget {
-            background-color: #1e1e2e;
-            border: 1px solid #45475a;
-            border-radius: 8px;
-            color: #cdd6f4;
-        }
-        QListWidget::item {
-            padding: 5px;
-        }
-        QListWidget::item:hover {
-            background-color: #45475a;
-        }
-        QListWidget::item:selected {
-            background-color: #585b70;
-            color: #cdd6f4;
-        }
-    )");
+    m_packageList = new QListWidget();
+    m_packageList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    // Style applied by applyTheme
+    m_packageList->setToolTip("Double-click a package to view details. Select multiple to install specific packages.");
     m_packageList->setToolTip("Double-click a package to view details. Select multiple to install specific packages.");
     connect(m_packageList, &QListWidget::itemDoubleClicked, this, &ProfileView::onPackageDoubleClicked);
     detailsLayout->addWidget(m_packageList);
@@ -233,20 +265,9 @@ void ProfileView::setupUI() {
     QHBoxLayout* actionLayout = new QHBoxLayout();
     
     m_installBtn = new QPushButton("⬇️ Install Selected / All");
-    m_installBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #89b4fa;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        QPushButton:hover {
-            background-color: #b4befe;
-        }
-    )");
+    m_installBtn = new QPushButton("⬇️ Install Selected / All");
+    // Style applied by applyTheme
+    connect(m_installBtn, &QPushButton::clicked, this, &ProfileView::onInstallClicked);
     connect(m_installBtn, &QPushButton::clicked, this, &ProfileView::onInstallClicked);
     
     actionLayout->addWidget(m_installBtn);
@@ -258,21 +279,8 @@ void ProfileView::setupUI() {
     mainLayout->addWidget(splitter);
     
     // Style groups
-    setStyleSheet(R"(
-        QGroupBox {
-            font-weight: bold;
-            color: #89b4fa;
-            border: 1px solid #45475a;
-            border-radius: 8px;
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 0 5px;
-        }
-    )");
+    // Style groups
+    // Style applied by applyTheme
 }
 
 void ProfileView::refreshProfiles() {
@@ -402,7 +410,7 @@ void ProfileView::onInstallClicked() {
     
     if (reply != QMessageBox::Yes) return;
     
-    QString command = QString("pacman -S %1 --noconfirm --needed").arg(toInstall.join(" "));
+    QString command = QString("pacman -S %1 --needed").arg(toInstall.join(" "));
     
     bool success = PrivilegedRunner::runCommand(command,
         QString("Installing profile: %1").arg(profile.name), this);

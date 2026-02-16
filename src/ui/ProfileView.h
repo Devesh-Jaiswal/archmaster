@@ -17,6 +17,8 @@ class ProfileView : public QWidget {
 public:
     explicit ProfileView(ProfileManager* pm, PackageManager* pkgMgr, QWidget* parent = nullptr);
     
+    void applyTheme(bool isDark);
+    
 private slots:
     void onProfileSelected(int index);
     void onInstallClicked();

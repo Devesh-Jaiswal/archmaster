@@ -53,6 +53,7 @@ private:
     void setupConnections();
     void setupShortcuts();
     void applyTheme();
+    void applyThemeToViews(bool isDark);
     void loadSettings();
     void saveSettings();
     

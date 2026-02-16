@@ -9,9 +9,12 @@
 #include <QBarSeries>
 #include <QPushButton>
 #include <QDateTime>
+#include <QElapsedTimer>
 
 class PackageManager;
 class Database;
+
+#include "models/Package.h"
 
 class AnalyticsView : public QWidget {
     Q_OBJECT
@@ -19,12 +22,13 @@ class AnalyticsView : public QWidget {
 public:
     explicit AnalyticsView(PackageManager* pm, Database* db, QWidget* parent = nullptr);
     
+    void applyTheme(bool isDark);
     void refresh();
     
 private slots:
     void onCleanOrphans();
-    void onViewPacnewFiles();
     void onCleanCache();
+    void refreshInBackground();
     
 private:
     void setupUI();
@@ -42,19 +46,17 @@ private:
     
     // Health check methods
     QDateTime getLastSyncTime();
-    QStringList findPacnewFiles();
     qint64 getCacheSize();
+    void cachePackageData();
     
     PackageManager* m_packageManager;
     Database* m_database;
     
     // Health status cards
     QLabel* m_lastSyncLabel;
-    QLabel* m_pacnewLabel;
     QLabel* m_cacheSizeLabel;
     QLabel* m_orphansSummaryLabel;
     QPushButton* m_cleanOrphansBtn;
-    QPushButton* m_viewPacnewBtn;
     QPushButton* m_cleanCacheBtn;
     
     // Stats cards
@@ -79,7 +81,12 @@ private:
     QLabel* m_repoCountLabel;
     
     // Cached data
-    QStringList m_pacnewFiles;
+
+    
+    // Caching state
+    bool m_dataLoaded = false;
+    QElapsedTimer m_lastRefresh;
+    QList<Package> m_cachedPackages;
 };
 
 #endif // ANALYTICSVIEW_H

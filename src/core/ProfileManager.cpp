@@ -118,22 +118,17 @@ void ProfileManager::loadProfiles() {
 }
 
 bool ProfileManager::saveProfile(const PackageProfile& profile) {
-    // Check if profile with this name exists
+    // Check if profile with this name exists, update in-place if so
+    bool found = false;
     for (int i = 0; i < m_userProfiles.size(); ++i) {
         if (m_userProfiles[i].name == profile.name) {
             m_userProfiles[i] = profile;
+            found = true;
             break;
         }
     }
     
     // Add new profile if not found
-    bool found = false;
-    for (const PackageProfile& p : m_userProfiles) {
-        if (p.name == profile.name) {
-            found = true;
-            break;
-        }
-    }
     if (!found) {
         m_userProfiles.append(profile);
     }

@@ -29,6 +29,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
+#include <QTimer>
 
 AnalyticsView::AnalyticsView(PackageManager* pm, Database* db, QWidget* parent)
     : QWidget(parent)
@@ -49,14 +50,9 @@ void AnalyticsView::setupUI() {
     mainLayout->setContentsMargins(20, 20, 20, 20);
     
     // ==================== SYSTEM HEALTH SECTION ====================
+    // ==================== SYSTEM HEALTH SECTION ====================
     QGroupBox* healthGroup = new QGroupBox("🏥 System Health");
-    healthGroup->setStyleSheet(R"(
-        QGroupBox {
-            font-size: 16px;
-            font-weight: bold;
-            padding-top: 10px;
-        }
-    )");
+    // Style will be applied by applyTheme
     QHBoxLayout* healthLayout = new QHBoxLayout(healthGroup);
     healthLayout->setSpacing(15);
     
@@ -66,14 +62,7 @@ void AnalyticsView::setupUI() {
                                 const QString& btnText, const QString& color) -> QWidget* {
         QWidget* card = new QWidget();
         card->setObjectName("healthCard");
-        card->setStyleSheet(QString(R"(
-            QWidget#healthCard {
-                background-color: #313244;
-                border-radius: 12px;
-                border-left: 4px solid %1;
-                padding: 10px;
-            }
-        )").arg(color));
+
         
         QVBoxLayout* layout = new QVBoxLayout(card);
         layout->setSpacing(8);
@@ -111,28 +100,18 @@ void AnalyticsView::setupUI() {
     // Last Sync card (no action button)
     QWidget* syncCard = new QWidget();
     syncCard->setObjectName("healthCard");
-    syncCard->setStyleSheet(R"(
-        QWidget#healthCard {
-            background-color: #313244;
-            border-radius: 12px;
-            border-left: 4px solid #89b4fa;
-            padding: 10px;
-        }
-    )");
+    // Styles will be applied by applyTheme
     QVBoxLayout* syncLayout = new QVBoxLayout(syncCard);
     QLabel* syncTitle = new QLabel("🕐 Last Sync");
-    syncTitle->setStyleSheet("font-size: 14px; font-weight: bold; color: #cdd6f4;");
+    syncTitle->setStyleSheet("font-size: 14px; font-weight: bold; color: #cdd6f4;"); // Keep for initial color
     m_lastSyncLabel = new QLabel("Loading...");
-    m_lastSyncLabel->setStyleSheet("font-size: 12px; color: #a6adc8;");
+    m_lastSyncLabel->setStyleSheet("font-size: 12px; color: #a6adc8;"); // Keep for initial color
     syncLayout->addWidget(syncTitle);
     syncLayout->addWidget(m_lastSyncLabel);
     syncLayout->addStretch();
     healthLayout->addWidget(syncCard);
     
-    // Pacnew files card
-    healthLayout->addWidget(createHealthCard("📄", ".pacnew Files", 
-        m_pacnewLabel, m_viewPacnewBtn, "View", "#f9e2af"));
-    connect(m_viewPacnewBtn, &QPushButton::clicked, this, &AnalyticsView::onViewPacnewFiles);
+    // Pacnew files card removed as per user request
     
     // Cache size card
     healthLayout->addWidget(createHealthCard("💾", "Package Cache",
@@ -153,23 +132,17 @@ void AnalyticsView::setupUI() {
     auto createStatCard = [](const QString& title, QLabel*& valueLabel) -> QWidget* {
         QWidget* card = new QWidget();
         card->setObjectName("statCard");
-        card->setStyleSheet(R"(
-            QWidget#statCard {
-                background-color: #313244;
-                border-radius: 12px;
-                padding: 15px;
-            }
-        )");
+        // Styles will be applied by applyTheme
         
         QVBoxLayout* layout = new QVBoxLayout(card);
         layout->setAlignment(Qt::AlignCenter);
         
         valueLabel = new QLabel("0");
-        valueLabel->setStyleSheet("font-size: 32px; font-weight: bold; color: #89b4fa;");
+        valueLabel->setStyleSheet("font-size: 32px; font-weight: bold; color: #89b4fa;"); // Keep for initial color
         valueLabel->setAlignment(Qt::AlignCenter);
         
         QLabel* titleLabel = new QLabel(title);
-        titleLabel->setStyleSheet("font-size: 12px; color: #a6adc8;");
+        titleLabel->setStyleSheet("font-size: 12px; color: #a6adc8;"); // Keep for initial color
         titleLabel->setAlignment(Qt::AlignCenter);
         
         layout->addWidget(valueLabel);
@@ -239,7 +212,7 @@ void AnalyticsView::setupUI() {
     
     QLabel* orphansHelp = new QLabel("These packages were installed as dependencies but are no longer required by any package.");
     orphansHelp->setWordWrap(true);
-    orphansHelp->setStyleSheet("color: #f9e2af; font-size: 11px; margin-bottom: 10px;");
+    orphansHelp->setStyleSheet("color: #f9e2af; font-size: 11px; margin-bottom: 10px;"); // Keep for initial color
     orphansLayout->addWidget(orphansHelp);
     
     m_orphansTable = new QTableWidget();
@@ -280,11 +253,11 @@ void AnalyticsView::setupUI() {
     // Repo count
     QHBoxLayout* repoRow = new QHBoxLayout();
     QLabel* repoIcon = new QLabel("📦");
-    repoIcon->setStyleSheet("font-size: 24px;");
+    repoIcon->setStyleSheet("font-size: 24px;"); // Keep for initial color
     QVBoxLayout* repoInfo = new QVBoxLayout();
     repoInfo->addWidget(new QLabel("Official Repositories"));
     m_repoCountLabel = new QLabel("Loading...");
-    m_repoCountLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #89b4fa;");
+    m_repoCountLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #89b4fa;"); // Keep for initial color
     repoInfo->addWidget(m_repoCountLabel);
     repoRow->addWidget(repoIcon);
     repoRow->addLayout(repoInfo);
@@ -294,11 +267,11 @@ void AnalyticsView::setupUI() {
     // AUR count
     QHBoxLayout* aurRow = new QHBoxLayout();
     QLabel* aurIcon = new QLabel("🌐");
-    aurIcon->setStyleSheet("font-size: 24px;");
+    aurIcon->setStyleSheet("font-size: 24px;"); // Keep for initial color
     QVBoxLayout* aurInfo = new QVBoxLayout();
     aurInfo->addWidget(new QLabel("AUR Packages"));
     m_aurCountLabel = new QLabel("Loading...");
-    m_aurCountLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #f9e2af;");
+    m_aurCountLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #f9e2af;"); // Keep for initial color
     aurInfo->addWidget(m_aurCountLabel);
     aurRow->addWidget(aurIcon);
     aurRow->addLayout(aurInfo);
@@ -314,20 +287,206 @@ void AnalyticsView::setupUI() {
     
     scrollArea->setWidget(content);
     
-    QVBoxLayout* wrapperLayout = new QVBoxLayout(this);
-    wrapperLayout->setContentsMargins(0, 0, 0, 0);
-    wrapperLayout->addWidget(scrollArea);
+    QVBoxLayout* finalLayout = new QVBoxLayout(this);
+    finalLayout->setContentsMargins(0, 0, 0, 0);
+    finalLayout->addWidget(scrollArea);
+    
+    // Initial theme application
+    applyTheme(true);
+}
+
+void AnalyticsView::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#1e1e2e" : "#eff1f5";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString cardBg = isDark ? "#313244" : "#e6e9ef";
+    QString subTextColor = isDark ? "#a6adc8" : "#6c6f85";
+    QString gridColor = isDark ? "#45475a" : "#ccd0da";
+    
+    // Accents
+    QString accentColor = isDark ? "#89b4fa" : "#1e66f5"; // Blue
+    QString greenColor = isDark ? "#a6e3a1" : "#40a02b";
+    QString redColor = isDark ? "#f38ba8" : "#d20f39";
+    QString yellowColor = isDark ? "#f9e2af" : "#df8e1d";
+
+    // Update Health Cards
+    QList<QWidget*> cards = this->findChildren<QWidget*>("healthCard");
+    for (QWidget* card : cards) {
+        // We need to re-apply the layout/style because createHealthCard 
+        // set hardcoded styles. Ideally we should have a class, but for now:
+        
+        // Fix background
+        // Card background: Mantle (Dark) or Surface0/White (Light)
+        QString cardBackground = isDark ? "#313244" : "#ffffff";
+        
+        // Parse existing style or just force new one?
+        // Let's force a clean style for the card container
+        card->setStyleSheet(QString(R"(
+            QWidget#healthCard {
+                background-color: %1;
+                border: 1px solid %2;
+                border-radius: 12px;
+            }
+        )").arg(cardBackground, gridColor));
+        
+        // Update children labels
+        QList<QLabel*> cardLabels = card->findChildren<QLabel*>();
+        for (QLabel* lbl : cardLabels) {
+            // Title labels usually have larger font
+            if (lbl->font().pointSize() > 10 || lbl->text().contains("Last Sync") || lbl->text().contains("Cache") || lbl->text().contains("Orphan")) {
+                // Title
+                 lbl->setStyleSheet(QString("font-size: 14px; font-weight: bold; color: %1;").arg(textColor));
+            } else {
+                // Status/Subtext
+                 lbl->setStyleSheet(QString("font-size: 12px; color: %1;").arg(subTextColor));
+            }
+        }
+    }
+    
+    // Update Stats Labels
+    QString labelStyle = QString("font-size: 24px; font-weight: bold; color: %1;").arg(accentColor);
+    if(m_totalPackagesLabel) m_totalPackagesLabel->setStyleSheet(labelStyle);
+    if(m_explicitLabel) m_explicitLabel->setStyleSheet(QString("font-size: 24px; font-weight: bold; color: %1;").arg(greenColor));
+    if(m_depsLabel) m_depsLabel->setStyleSheet(labelStyle);
+    if(m_orphansLabel) m_orphansLabel->setStyleSheet(QString("font-size: 24px; font-weight: bold; color: %1;").arg(redColor));
+    if(m_totalSizeLabel) m_totalSizeLabel->setStyleSheet(QString("font-size: 24px; font-weight: bold; color: %1;").arg(yellowColor));
+    if(m_notesCountLabel) m_notesCountLabel->setStyleSheet(labelStyle);
+    
+    // Group Boxes
+    QString groupStyle = QString(R"(
+        QGroupBox {
+            font-size: 16px;
+            font-weight: bold;
+            padding-top: 10px;
+            color: %1;
+            border: 2px solid %2;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            left: 10px;
+            padding: 0 5px;
+        }
+    )").arg(textColor, gridColor);
+    
+    QList<QGroupBox*> groups = this->findChildren<QGroupBox*>();
+    for (QGroupBox* group : groups) {
+        group->setStyleSheet(groupStyle);
+    }
+    
+    // Charts
+    auto theme = isDark ? QChart::ChartThemeDark : QChart::ChartThemeLight;
+    QColor chartBg = isDark ? QColor("#1e1e2e") : QColor("#eff1f5");
+    
+    if (m_diskUsageChart && m_diskUsageChart->chart()) {
+        m_diskUsageChart->chart()->setTheme(theme);
+        m_diskUsageChart->chart()->setBackgroundBrush(chartBg);
+        
+        // Fix Pie Slice Colors if needed (requires digging into slices)
+        // For now, relies on recreate
+    }
+    if (m_timelineChart && m_timelineChart->chart()) {
+        m_timelineChart->chart()->setTheme(theme);
+        m_timelineChart->chart()->setBackgroundBrush(chartBg);
+        
+        // Update axes
+        QList<QAbstractAxis*> axes = m_timelineChart->chart()->axes();
+        for(auto axis : axes) {
+            axis->setLabelsColor(QColor(subTextColor));
+            axis->setGridLineColor(QColor(gridColor));
+        }
+    }
+    
+    // Tables
+    QString tableStyle = QString(R"(
+        QTableWidget {
+            background-color: %1;
+            alternate-background-color: %2;
+            color: %3;
+            border: 1px solid %4;
+            border-radius: 8px;
+            gridline-color: %4;
+            selection-background-color: %5;
+            selection-color: %6;
+        }
+        QTableWidget::item {
+            padding: 5px;
+        }
+        QHeaderView::section {
+            background-color: %2;
+            color: %3;
+            padding: 5px;
+            border: none;
+            border-bottom: 2px solid %4;
+            font-weight: bold;
+        }
+        QTableCornerButton::section {
+            background-color: %2;
+            border: none;
+            border-bottom: 2px solid %4;
+        }
+    )").arg(
+        isDark ? "#1e1e2e" : "#eff1f5", // Bg
+        isDark ? "#313244" : "#e6e9ef", // Alt/Header
+        textColor, gridColor,
+        isDark ? "#45475a" : "#bcc0cc", // Selection Bg
+        textColor // Selection Text
+    );
+            
+    if (m_topPackagesTable) m_topPackagesTable->setStyleSheet(tableStyle);
+    if (m_orphansTable) m_orphansTable->setStyleSheet(tableStyle);
+    if (m_recentlyUpdatedTable) m_recentlyUpdatedTable->setStyleSheet(tableStyle);
+    
+    // Orphans Help Label
+    // Was hardcoded #f9e2af (yellow)
+    QList<QLabel*> labels = findChildren<QLabel*>();
+    for(auto l : labels) {
+        if (l->text().contains("dependencies but are no longer")) {
+            l->setStyleSheet(QString("color: %1; font-size: 11px; margin-bottom: 10px;").arg(yellowColor));
+        }
+    }
 }
 
 void AnalyticsView::refresh() {
+    // If data was loaded recently (< 5 minutes), show cached data instantly
+    if (m_dataLoaded && m_lastRefresh.isValid() && m_lastRefresh.elapsed() < 300000) {
+        // Data is fresh — do nothing, cached UI is already displayed
+        return;
+    }
+    
+    if (m_dataLoaded) {
+        // Data exists but is stale — show cached data immediately,
+        // then refresh expensive operations in background
+        updateStats();  // Fast — just reads counts
+        QTimer::singleShot(0, this, &AnalyticsView::refreshInBackground);
+    } else {
+        // First load — show fast stats immediately, defer heavy work
+        updateStats();
+        updateOrphansList();
+        m_dataLoaded = true;
+        QTimer::singleShot(0, this, &AnalyticsView::refreshInBackground);
+    }
+    
+    m_lastRefresh.start();
+}
+
+void AnalyticsView::refreshInBackground() {
+    // Cache all packages once for this refresh cycle
+    cachePackageData();
+    
+    // Now run all the expensive operations using cached data
     updateHealthStatus();
-    updateStats();
     updateDiskUsageChart();
     updateTimelineChart();
     updateTopPackages();
     updateOrphansList();
     updateRecentlyUpdated();
     updateAurVsRepo();
+    m_lastRefresh.start();
+}
+
+void AnalyticsView::cachePackageData() {
+    m_cachedPackages = m_packageManager->getAllPackages();
 }
 
 void AnalyticsView::updateStats() {
@@ -350,7 +509,8 @@ void AnalyticsView::updateStats() {
 }
 
 void AnalyticsView::updateDiskUsageChart() {
-    QList<Package> packages = m_packageManager->getAllPackages();
+    // Use cached packages to avoid expensive getAllPackages() call
+    const QList<Package>& packages = m_cachedPackages;
     
     // Calculate size by reason
     qint64 explicitSize = 0;
@@ -383,7 +543,9 @@ void AnalyticsView::updateDiskUsageChart() {
     chart->setBackgroundVisible(false);
     chart->setMargins(QMargins(0, 0, 0, 0));
     
+    QChart* oldChart = m_diskUsageChart->chart();
     m_diskUsageChart->setChart(chart);
+    delete oldChart;
 }
 
 void AnalyticsView::updateTimelineChart() {
@@ -433,16 +595,16 @@ void AnalyticsView::updateTimelineChart() {
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
     
+    QChart* oldTimelineChart = m_timelineChart->chart();
     m_timelineChart->setChart(chart);
+    delete oldTimelineChart;
 }
 
 void AnalyticsView::updateTopPackages() {
-    QMap<QString, qint64> sizes = m_packageManager->getSizeByPackage();
-    
-    // Sort by size
+    // Use cached packages instead of getSizeByPackage()
     QList<QPair<QString, qint64>> sorted;
-    for (auto it = sizes.begin(); it != sizes.end(); ++it) {
-        sorted.append(qMakePair(it.key(), it.value()));
+    for (const Package& pkg : m_cachedPackages) {
+        sorted.append(qMakePair(pkg.name, pkg.installedSize));
     }
     std::sort(sorted.begin(), sorted.end(), [](const auto& a, const auto& b) {
         return a.second > b.second;
@@ -590,15 +752,7 @@ void AnalyticsView::updateHealthStatus() {
         m_lastSyncLabel->setText("Unknown");
     }
     
-    // Pacnew files
-    m_pacnewFiles = findPacnewFiles();
-    if (m_pacnewFiles.isEmpty()) {
-        m_pacnewLabel->setText("✅ No files need merging");
-        m_viewPacnewBtn->setEnabled(false);
-    } else {
-        m_pacnewLabel->setText(QString("🔴 %1 file(s) need attention").arg(m_pacnewFiles.size()));
-        m_viewPacnewBtn->setEnabled(true);
-    }
+    // Pacnew files check removed
     
     // Cache size
     qint64 cacheSize = getCacheSize();
@@ -639,24 +793,7 @@ QDateTime AnalyticsView::getLastSyncTime() {
     return latestTime;
 }
 
-QStringList AnalyticsView::findPacnewFiles() {
-    QStringList pacnewFiles;
-    
-    QProcess proc;
-    proc.start("find", {"/etc", "-name", "*.pacnew", "-type", "f"});
-    proc.waitForFinished(5000);
-    
-    QString output = QString::fromUtf8(proc.readAllStandardOutput());
-    QStringList lines = output.split('\n', Qt::SkipEmptyParts);
-    
-    for (const QString& line : lines) {
-        if (!line.trimmed().isEmpty()) {
-            pacnewFiles.append(line.trimmed());
-        }
-    }
-    
-    return pacnewFiles;
-}
+
 
 qint64 AnalyticsView::getCacheSize() {
     QProcess proc;
@@ -691,7 +828,7 @@ void AnalyticsView::onCleanOrphans() {
     
     if (reply == QMessageBox::Yes) {
         bool success = PrivilegedRunner::runCommand(
-            "pacman -Rns $(pacman -Qtdq) --noconfirm",
+            "pacman -Rns $(pacman -Qtdq)",
             QString("Removing %1 orphaned package(s)").arg(orphanCount),
             this);
         
@@ -703,32 +840,7 @@ void AnalyticsView::onCleanOrphans() {
     }
 }
 
-void AnalyticsView::onViewPacnewFiles() {
-    if (m_pacnewFiles.isEmpty()) {
-        QMessageBox::information(this, "No .pacnew Files", "There are no .pacnew files that need attention.");
-        return;
-    }
-    
-    QString message = ".pacnew files found:\n\n";
-    for (const QString& file : m_pacnewFiles) {
-        message += "• " + file + "\n";
-    }
-    message += "\nWould you like to run pacdiff to review and merge these files?";
-    
-    QMessageBox::StandardButton reply = QMessageBox::question(this, ".pacnew Files", message,
-        QMessageBox::Yes | QMessageBox::No);
-    
-    if (reply == QMessageBox::Yes) {
-        bool success = PrivilegedRunner::runCommand(
-            "pacdiff",
-            "Reviewing .pacnew configuration files",
-            this);
-        
-        if (success) {
-            refresh();
-        }
-    }
-}
+
 
 void AnalyticsView::onCleanCache() {
     qint64 cacheSize = getCacheSize();

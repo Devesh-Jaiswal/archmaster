@@ -22,6 +22,8 @@ public:
     static bool runCommand(const QString& command,
                           const QString& description,
                           QWidget* parent = nullptr);
+                          
+    void applyTheme(bool isDark);
     
     bool wasSuccessful() const { return m_success; }
     QString output() const { return m_output; }
@@ -34,6 +36,7 @@ signals:
     
 private slots:
     void onAuthenticate();
+    void onSendInput();
     void onProcessOutput();
     void onProcessError();
     void onProcessFinished(int exitCode, QProcess::ExitStatus status);
@@ -55,6 +58,11 @@ private:
     bool m_success;
     QString m_output;
     QString m_errorOutput;
+    
+    // Interactive input
+    QLineEdit* m_inputEdit;
+    QPushButton* m_sendInputBtn;
+    QWidget* m_inputBar;
 };
 
 #endif // PRIVILEGEDRUNNER_H

@@ -16,6 +16,152 @@ SearchView::SearchView(PackageManager* pm, AURClient* aur, QWidget* parent)
     , m_aurClient(aur)
 {
     setupUI();
+    // Apply initial theme based on Config or default
+    // We'll let MainWindow call applyTheme, but we should have a default
+}
+
+void SearchView::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#1e1e2e" : "#eff1f5";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString subTextColor = isDark ? "#a6adc8" : "#6c6f85";
+    QString borderColor = isDark ? "#45475a" : "#ccd0da";
+    QString headerColor = isDark ? "#89b4fa" : "#1e66f5";
+    QString inputBg = isDark ? "#313244" : "#e6e9ef";
+    
+    // Header
+    QList<QLabel*> labels = findChildren<QLabel*>();
+    for(auto label : labels) {
+        if(label->text().contains("Search Packages")) {
+             label->setStyleSheet(QString("font-size: 24px; font-weight: bold; color: %1;").arg(textColor));
+        } else if(label->text().contains("Search for packages in")) {
+             label->setStyleSheet(QString("color: %1; margin-bottom: 10px;").arg(subTextColor));
+        } else if(label == m_statusLabel) {
+             label->setStyleSheet(QString("color: %1;").arg(subTextColor));
+        }
+    }
+    
+    // Input fields style
+    QString inputStyle = QString(R"(
+        QLineEdit {
+            background-color: %1;
+            border: 2px solid %2;
+            border-radius: 8px;
+            padding: 8px 15px;
+            color: %3;
+            font-size: 14px;
+        }
+        QLineEdit:focus {
+            border-color: %4;
+        }
+    )").arg(inputBg, borderColor, textColor, headerColor);
+    
+    if(m_searchEdit) m_searchEdit->setStyleSheet(inputStyle);
+    
+    // Combo box
+    if(m_sourceCombo) {
+        m_sourceCombo->setStyleSheet(QString(R"(
+            QComboBox {
+                background-color: %1;
+                border: 2px solid %2;
+                border-radius: 8px;
+                padding: 8px 15px;
+                color: %3;
+            }
+            QComboBox::drop-down {
+                border: none;
+            }
+        )").arg(inputBg, borderColor, textColor));
+    }
+    
+    // Search Button
+    if(m_searchBtn) {
+        m_searchBtn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(headerColor, isDark ? "#1e1e2e" : "#ffffff", isDark ? "#b4befe" : "#7287fd"));
+    }
+    
+    // Install Button
+    if(m_installBtn) {
+        m_installBtn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+            QPushButton:disabled {
+                background-color: %4;
+                color: %5;
+            }
+        )").arg(
+            isDark ? "#a6e3a1" : "#40a02b", // Green
+            isDark ? "#1e1e2e" : "#ffffff", 
+            isDark ? "#94e2d5" : "#179299", // Teal
+            isDark ? "#45475a" : "#ccd0da",
+            isDark ? "#6c7086" : "#9ca0b0"
+        ));
+    }
+    
+    // Table View
+    if (m_resultsTable) {
+        m_resultsTable->setStyleSheet(QString(R"(
+            QTableWidget {
+                background-color: %1;
+                alternate-background-color: %2;
+                color: %3;
+                border: 1px solid %4;
+                border-radius: 8px;
+                selection-background-color: %5;
+                selection-color: %3;
+            }
+            QHeaderView::section {
+                background-color: %2;
+                color: %3;
+                padding: 4px;
+                border: none;
+                border-bottom: 2px solid %4;
+                font-weight: bold;
+            }
+            QTableCornerButton::section {
+                background-color: %2;
+                border: none;
+                border-bottom: 2px solid %4;
+            }
+        )").arg(
+            bgColor, 
+            isDark ? "#313244" : "#e6e9ef", // Alt/Header
+            textColor, borderColor,
+            isDark ? "#45475a" : "#bcc0cc")); // Selection Bg
+            
+        // We also need to update row colors dynamically, but they are set in performSearch.
+        // We can't easily retroactively update items without iterating them.
+        // So we just rely on TableWidget style for main text, and custom items will be rebuilt on search.
+        // HOWEVER, we SHOULD update existing items if possible.
+        for(int i=0; i<m_resultsTable->rowCount(); i++) {
+            // Update status item color
+             QTableWidgetItem* statusItem = m_resultsTable->item(i, 2);
+             if (statusItem) {
+                 bool installed = statusItem->text().contains("Installed");
+                 if (installed) statusItem->setForeground(QColor(isDark ? "#a6e3a1" : "#40a02b"));
+                 else statusItem->setForeground(QColor(isDark ? "#89b4fa" : "#1e66f5"));
+             }
+        }
+    }
 }
 
 void SearchView::setupUI() {
@@ -25,11 +171,11 @@ void SearchView::setupUI() {
     
     // Header
     QLabel* headerLabel = new QLabel("🔍 Search Packages");
-    headerLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #cdd6f4;");
+    // Style applied by applyTheme
     mainLayout->addWidget(headerLabel);
     
     QLabel* subLabel = new QLabel("Search for packages in AUR or official repositories");
-    subLabel->setStyleSheet("color: #a6adc8; margin-bottom: 10px;");
+    // Style applied by applyTheme
     mainLayout->addWidget(subLabel);
     
     // Search bar
@@ -38,19 +184,8 @@ void SearchView::setupUI() {
     m_searchEdit = new QLineEdit();
     m_searchEdit->setPlaceholderText("Enter package name to search...");
     m_searchEdit->setMinimumHeight(40);
-    m_searchEdit->setStyleSheet(R"(
-        QLineEdit {
-            background-color: #313244;
-            border: 2px solid #45475a;
-            border-radius: 8px;
-            padding: 8px 15px;
-            color: #cdd6f4;
-            font-size: 14px;
-        }
-        QLineEdit:focus {
-            border-color: #89b4fa;
-        }
-    )");
+    m_searchEdit->setMinimumHeight(40);
+    // Style applied by applyTheme
     connect(m_searchEdit, &QLineEdit::returnPressed, this, &SearchView::performSearch);
     searchLayout->addWidget(m_searchEdit);
     
@@ -60,40 +195,17 @@ void SearchView::setupUI() {
     m_sourceCombo->addItem("📂 Find by File", "file");
     m_sourceCombo->setMinimumHeight(40);
     m_sourceCombo->setMinimumWidth(180);
-    m_sourceCombo->setStyleSheet(R"(
-        QComboBox {
-            background-color: #313244;
-            border: 2px solid #45475a;
-            border-radius: 8px;
-            padding: 8px 15px;
-            color: #cdd6f4;
-        }
-        QComboBox::drop-down {
-            border: none;
-        }
-        QComboBox::down-arrow {
-            image: none;
-            border: none;
-        }
-    )");
+    m_sourceCombo->setMinimumHeight(40);
+    m_sourceCombo->setMinimumWidth(180);
+    // Style applied by applyTheme
     searchLayout->addWidget(m_sourceCombo);
     
     m_searchBtn = new QPushButton("Search");
     m_searchBtn->setMinimumHeight(40);
     m_searchBtn->setMinimumWidth(100);
-    m_searchBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #89b4fa;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        QPushButton:hover {
-            background-color: #b4befe;
-        }
-    )");
+    m_searchBtn->setMinimumHeight(40);
+    m_searchBtn->setMinimumWidth(100);
+    // Style applied by applyTheme
     connect(m_searchBtn, &QPushButton::clicked, this, &SearchView::performSearch);
     searchLayout->addWidget(m_searchBtn);
     
@@ -107,7 +219,8 @@ void SearchView::setupUI() {
     QVBoxLayout* resultsLayout = new QVBoxLayout(resultsGroup);
     
     m_statusLabel = new QLabel("Enter a search term and click Search");
-    m_statusLabel->setStyleSheet("color: #a6adc8;");
+    m_statusLabel = new QLabel("Enter a search term and click Search");
+    // Style applied by applyTheme
     resultsLayout->addWidget(m_statusLabel);
     
     m_resultsTable = new QTableWidget();
@@ -138,23 +251,10 @@ void SearchView::setupUI() {
     m_installBtn = new QPushButton("📥 Install Package");
     m_installBtn->setMinimumHeight(45);
     m_installBtn->setEnabled(false);
-    m_installBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #a6e3a1;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        QPushButton:hover {
-            background-color: #94e2d5;
-        }
-        QPushButton:disabled {
-            background-color: #45475a;
-            color: #6c7086;
-        }
-    )");
+    m_installBtn = new QPushButton("📥 Install Package");
+    m_installBtn->setMinimumHeight(45);
+    m_installBtn->setEnabled(false);
+    // Style applied by applyTheme
     connect(m_installBtn, &QPushButton::clicked, this, &SearchView::onInstallClicked);
     detailsLayout->addWidget(m_installBtn);
     
@@ -396,9 +496,9 @@ void SearchView::showPackageInfo(int row) {
     
     m_infoText->setHtml(info);
     
-    m_installBtn->setEnabled(!pkg.installed);
+    m_installBtn->setEnabled(true);
     if (pkg.installed) {
-        m_installBtn->setText("✅ Already Installed");
+        m_installBtn->setText("🗑️ Remove Package");
     } else if (pkg.source == "aur") {
         m_installBtn->setText("📥 Install from AUR (requires yay/paru)");
     } else {
@@ -422,7 +522,7 @@ void SearchView::onInstallClicked() {
         
         if (reply == QMessageBox::Yes) {
             bool success = PrivilegedRunner::runCommand(
-                QString("pacman -Rs %1 --noconfirm").arg(pkg.name),
+                QString("pacman -Rs %1").arg(pkg.name),
                 QString("Removing package: %1").arg(pkg.name),
                 this);
             
@@ -441,10 +541,10 @@ void SearchView::onInstallClicked() {
         
         if (pkg.source == "aur") {
             // For AUR, we need an AUR helper
-            command = QString("yay -S %1 --noconfirm || paru -S %1 --noconfirm").arg(pkg.name);
+            command = QString("yay -S %1 || paru -S %1").arg(pkg.name);
             description = QString("Installing AUR package: %1").arg(pkg.name);
         } else {
-            command = QString("pacman -S %1 --noconfirm").arg(pkg.name);
+            command = QString("pacman -S %1").arg(pkg.name);
             description = QString("Installing package: %1").arg(pkg.name);
         }
         

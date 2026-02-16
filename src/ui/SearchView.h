@@ -18,6 +18,8 @@ class SearchView : public QWidget {
 public:
     explicit SearchView(PackageManager* pm, AURClient* aur, QWidget* parent = nullptr);
     
+    void applyTheme(bool isDark);
+    
 private slots:
     void performSearch();
     void onResultClicked(int row, int column);

@@ -1,4 +1,5 @@
 #include "PrivilegedRunner.h"
+#include "utils/Config.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -16,9 +17,164 @@ PrivilegedRunner::PrivilegedRunner(const QString& command,
     , m_success(false)
 {
     setWindowTitle("🔐 Authentication Required");
-    setMinimumSize(500, 400);
+    setMinimumSize(600, 550);
+    resize(650, 600);
     setModal(true);
     setupUI();
+    // Apply initial theme
+    applyTheme(Config::instance()->darkMode());
+}
+
+void PrivilegedRunner::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#313244" : "#eff1f5"; // Dialog (Surface0 in Latte/Mocha? Check Palette)
+    // Actually for Dialog main bg, Mocha Base is #1e1e2e, Surface0 is #313244. 
+    // Latte Base is #eff1f5, Surface0 is #ccd0da. Let's use Base for dialogs usually or Surface. 
+    // The previous hardcoded was #313244 (Surface0). Let's stick to Surface0/Base logic.
+    QString dialogBg = isDark ? "#313244" : "#e6e9ef"; 
+    QString groupBg = isDark ? "#1e1e2e" : "#eff1f5";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString borderColor = isDark ? "#45475a" : "#ccd0da";
+    QString headerColor = isDark ? "#89b4fa" : "#1e66f5"; // Blue
+    QString subTextColor = isDark ? "#a6adc8" : "#6c6f85";
+    QString inputBg = isDark ? "#1e1e2e" : "#eff1f5";
+    
+    // Dialog
+    setStyleSheet(QString("QDialog { background-color: %1; }").arg(dialogBg));
+    
+    // Labels
+    QList<QLabel*> labels = this->findChildren<QLabel*>();
+    for(auto label : labels) {
+         if (label->text() == m_description) {
+              label->setStyleSheet(QString("font-size: 14px; font-weight: bold; color: %1;").arg(textColor));
+         } else if (label->text() == m_command) {
+              label->setStyleSheet(QString("font-family: monospace; color: %1; padding: 10px;").arg(headerColor));
+         } else if (label->text().contains("Input:")) {
+              label->setStyleSheet(QString("color: %1; font-weight: bold; font-size: 13px;").arg(isDark ? "#f9e2af" : "#df8e1d"));
+         } else if (label == m_statusLabel) {
+              // Status label color changes dynamically, just set base font if needed?
+              // The setupUI sets color: #a6adc8. We can leave it or set a base.
+         } else {
+              // General labels
+              label->setStyleSheet(QString("color: %1;").arg(textColor));
+         }
+    }
+    
+    // GroupBoxes
+    QString groupStyle = QString(R"(
+        QGroupBox {
+             font-weight: bold;
+             color: %1;
+             border: 1px solid %2;
+             border-radius: 8px;
+             margin-top: 10px;
+             padding-top: 10px;
+        }
+        QGroupBox::title {
+             subcontrol-origin: margin;
+             left: 10px;
+             padding: 0 5px;
+        }
+    )").arg(headerColor, borderColor);
+    
+    QList<QGroupBox*> groups = this->findChildren<QGroupBox*>();
+    for (QGroupBox* group : groups) {
+        group->setStyleSheet(groupStyle);
+    }
+    
+    // LineEdits
+    QString inputStyle = QString(R"(
+        QLineEdit {
+            background-color: %1;
+            color: %2;
+            border: 1px solid %3;
+            border-radius: 6px;
+            padding: 8px;
+        }
+    )").arg(inputBg, textColor, borderColor);
+    
+    if(m_passwordEdit) m_passwordEdit->setStyleSheet(inputStyle);
+    
+    // Input Bar Edit (Special)
+    if(m_inputEdit) {
+        m_inputEdit->setStyleSheet(QString(R"(
+            QLineEdit {
+                background-color: %1;
+                color: %2;
+                border: 2px solid %3;
+                border-radius: 6px;
+                padding: 8px;
+                font-family: monospace; 
+                font-size: 13px;
+            }
+        )").arg(inputBg, isDark ? "#a6e3a1" : "#40a02b", isDark ? "#f9e2af" : "#df8e1d"));
+    }
+    
+    // Output Text
+    if(m_outputEdit) {
+        m_outputEdit->setStyleSheet(QString(R"(
+            QTextEdit {
+                background-color: %1;
+                color: %2;
+                font-family: monospace;
+                font-size: 12px;
+                border: 1px solid %3;
+                border-radius: 6px;
+            }
+        )").arg(inputBg, textColor, borderColor));
+    }
+    
+    // Buttons
+    // Cancel
+    if(m_cancelBtn) {
+        m_cancelBtn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 6px;
+                padding: 10px 20px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(isDark ? "#45475a" : "#ccd0da", textColor, isDark ? "#585b70" : "#bcc0cc"));
+    }
+    
+    // Auth / Main Action
+    QString mainBtnStyle = QString(R"(
+        QPushButton {
+            background-color: %1;
+            color: %2;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: %3;
+        }
+    )").arg(headerColor, isDark ? "#1e1e2e" : "#ffffff", isDark ? "#b4befe" : "#7287fd");
+    
+    if(m_authBtn) m_authBtn->setStyleSheet(mainBtnStyle);
+    
+    // Input Send Button
+    if(m_sendInputBtn) {
+        m_sendInputBtn->setStyleSheet(QString(R"(
+            QPushButton {
+                background-color: %1;
+                color: %2;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 20px;
+                font-weight: bold;
+                font-size: 13px;
+            }
+            QPushButton:hover {
+                background-color: %3;
+            }
+        )").arg(isDark ? "#a6e3a1" : "#40a02b", isDark ? "#1e1e2e" : "#ffffff", isDark ? "#94e2d5" : "#179299"));
+    }
 }
 
 PrivilegedRunner::~PrivilegedRunner() {
@@ -42,7 +198,7 @@ void PrivilegedRunner::setupUI() {
     
     // Description
     QLabel* descLabel = new QLabel(m_description);
-    descLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #cdd6f4;");
+    // Style applied by applyTheme
     descLabel->setWordWrap(true);
     mainLayout->addWidget(descLabel);
     
@@ -50,7 +206,7 @@ void PrivilegedRunner::setupUI() {
     QGroupBox* cmdGroup = new QGroupBox("Command to run:");
     QVBoxLayout* cmdLayout = new QVBoxLayout(cmdGroup);
     QLabel* cmdLabel = new QLabel(m_command);
-    cmdLabel->setStyleSheet("font-family: monospace; color: #89b4fa; padding: 10px;");
+    // Style applied by applyTheme
     cmdLabel->setWordWrap(true);
     cmdLayout->addWidget(cmdLabel);
     mainLayout->addWidget(cmdGroup);
@@ -71,7 +227,7 @@ void PrivilegedRunner::setupUI() {
     
     // Status
     m_statusLabel = new QLabel("Ready to authenticate");
-    m_statusLabel->setStyleSheet("color: #a6adc8;");
+    // Style applied by applyTheme
     mainLayout->addWidget(m_statusLabel);
     
     // Progress bar
@@ -86,18 +242,45 @@ void PrivilegedRunner::setupUI() {
     
     m_outputEdit = new QTextEdit();
     m_outputEdit->setReadOnly(true);
-    m_outputEdit->setStyleSheet(R"(
-        QTextEdit {
-            background-color: #1e1e2e;
-            color: #cdd6f4;
-            font-family: monospace;
-            font-size: 12px;
-            border: 1px solid #45475a;
-            border-radius: 6px;
-        }
-    )");
-    m_outputEdit->setMinimumHeight(120);
+    // Style applied by applyTheme
+    m_outputEdit->setMinimumHeight(150);
     outputLayout->addWidget(m_outputEdit);
+    
+    // Interactive input bar INSIDE the output group for visibility
+    QFrame* inputSeparator = new QFrame();
+    inputSeparator->setFrameShape(QFrame::HLine);
+    inputSeparator->setStyleSheet("color: #45475a;");
+    
+    m_inputBar = new QWidget();
+    QHBoxLayout* inputBarLayout = new QHBoxLayout(m_inputBar);
+    inputBarLayout->setContentsMargins(0, 5, 0, 0);
+    
+    QLabel* inputLabel = new QLabel("⌨ Input:");
+    // Style applied by applyTheme
+    m_inputEdit = new QLineEdit();
+    m_inputEdit->setPlaceholderText("Type response here (e.g. Y/n, v/m/s/r/o/q) and press Enter...");
+    // Style applied by applyTheme
+    m_inputEdit->setMinimumHeight(36);
+    // Connection moved to after button creation to avoid null pointer access
+    // and to serialize input via button click
+    
+    m_sendInputBtn = new QPushButton("Send ↵");
+    m_sendInputBtn->setMinimumHeight(36);
+    m_sendInputBtn->setAutoDefault(false);
+    m_sendInputBtn->setDefault(false);
+    // Style applied by applyTheme
+    connect(m_sendInputBtn, &QPushButton::clicked, this, &PrivilegedRunner::onSendInput);
+    
+    // Trigger onSendInput on Enter (autoDefault is false on button, so this is safe)
+    connect(m_inputEdit, &QLineEdit::returnPressed, this, &PrivilegedRunner::onSendInput);
+    
+    inputBarLayout->addWidget(inputLabel);
+    inputBarLayout->addWidget(m_inputEdit, 1);
+    inputBarLayout->addWidget(m_sendInputBtn);
+    m_inputBar->setVisible(false);
+    
+    outputLayout->addWidget(inputSeparator);
+    outputLayout->addWidget(m_inputBar);
     mainLayout->addWidget(outputGroup);
     
     // Buttons
@@ -105,35 +288,18 @@ void PrivilegedRunner::setupUI() {
     buttonLayout->addStretch();
     
     m_cancelBtn = new QPushButton("Cancel");
-    m_cancelBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #45475a;
-            color: #cdd6f4;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 20px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #585b70;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     
     m_authBtn = new QPushButton("🔓 Authenticate & Run");
-    m_authBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #89b4fa;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 20px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #b4befe;
-        }
-    )");
+    // Style applied by applyTheme
+    // Make Auth button default so Enter triggers it
+    m_authBtn->setAutoDefault(true);
+    m_authBtn->setDefault(true);
+    
+    // Explicit connection removed to prevent double-trigger (setDefault handles it)
+    // connect(m_passwordEdit, &QLineEdit::returnPressed, this, &PrivilegedRunner::onAuthenticate);
+    
     connect(m_authBtn, &QPushButton::clicked, this, &PrivilegedRunner::onAuthenticate);
     
     buttonLayout->addWidget(m_cancelBtn);
@@ -141,37 +307,12 @@ void PrivilegedRunner::setupUI() {
     mainLayout->addLayout(buttonLayout);
     
     // Style the dialog
-    setStyleSheet(R"(
-        QDialog {
-            background-color: #313244;
-        }
-        QGroupBox {
-            font-weight: bold;
-            color: #89b4fa;
-            border: 1px solid #45475a;
-            border-radius: 8px;
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 0 5px;
-        }
-        QLineEdit {
-            background-color: #1e1e2e;
-            color: #cdd6f4;
-            border: 1px solid #45475a;
-            border-radius: 6px;
-            padding: 8px;
-        }
-        QLabel {
-            color: #cdd6f4;
-        }
-    )");
 }
 
 void PrivilegedRunner::onAuthenticate() {
+    // Prevent re-entrancy or double-clicks
+    if (!m_authBtn->isEnabled()) return;
+    
     QString password = m_passwordEdit->text();
     if (password.isEmpty()) {
         m_statusLabel->setText("⚠️ Please enter your password");
@@ -186,6 +327,16 @@ void PrivilegedRunner::onAuthenticate() {
     m_passwordEdit->setEnabled(false);
     m_outputEdit->clear();
     
+    // Clean up any previous process (e.g. from a failed auth attempt)
+    if (m_process) {
+        if (m_process->state() != QProcess::NotRunning) {
+            m_process->terminate();
+            m_process->waitForFinished(1000);
+        }
+        delete m_process;
+        m_process = nullptr;
+    }
+    
     // Create process with sudo
     m_process = new QProcess(this);
     m_process->setProcessChannelMode(QProcess::MergedChannels);
@@ -196,7 +347,15 @@ void PrivilegedRunner::onAuthenticate() {
             this, &PrivilegedRunner::onProcessFinished);
     
     // Use sudo with -S flag to read password from stdin
-    m_process->start("sudo", {"-S", "bash", "-c", m_command});
+    // Wrap with 'script' to provide a PTY for interactive commands (e.g. pacdiff)
+    // Create a temp wrapper script for diff -u to avoid shell quoting issues with export
+    QString setupWrapper = "echo -e '#!/bin/sh\\ndiff -u \"$@\"' > /tmp/pacdiff_diff && chmod +x /tmp/pacdiff_diff";
+    
+    QString escapedCmd = m_command;
+    escapedCmd.replace("'", "'\\''");
+    
+    QString wrappedCmd = QString("%1 && script -qec 'export DIFFPROG=/tmp/pacdiff_diff; %2' /dev/null").arg(setupWrapper, escapedCmd);
+    m_process->start("sudo", {"-S", "bash", "-c", wrappedCmd});
     
     if (!m_process->waitForStarted(3000)) {
         m_statusLabel->setText("❌ Failed to start process");
@@ -209,7 +368,13 @@ void PrivilegedRunner::onAuthenticate() {
     
     // Send password to sudo via stdin
     m_process->write((password + "\n").toUtf8());
-    m_process->closeWriteChannel();
+    // Don't close write channel — keep stdin open for interactive input
+    
+    // Show the interactive input bar prominently
+    m_inputBar->setVisible(true);
+    m_inputEdit->setFocus();
+    m_statusLabel->setText("⏳ Running... Type input below if the command asks for it.");
+    m_statusLabel->setStyleSheet("color: #f9e2af; font-weight: bold;");
     
     emit commandStarted();
 }
@@ -219,8 +384,14 @@ void PrivilegedRunner::onProcessOutput() {
         QString output = QString::fromUtf8(m_process->readAllStandardOutput());
         // Filter out password prompt
         output.remove(QRegularExpression("\\[sudo\\].*:"));
+        // Filter out ANSI escape codes (CSI sequences)
+        static const QRegularExpression ansiRegex("\x1b\\[[0-9;?]*[a-zA-Z]");
+        output.remove(ansiRegex);
+        
         m_output += output;
-        m_outputEdit->append(output);
+        m_outputEdit->moveCursor(QTextCursor::End);
+        m_outputEdit->insertPlainText(output);
+        m_outputEdit->moveCursor(QTextCursor::End);
         emit outputReceived(output);
     }
 }
@@ -235,13 +406,13 @@ void PrivilegedRunner::onProcessError() {
 
 void PrivilegedRunner::onProcessFinished(int exitCode, QProcess::ExitStatus status) {
     m_progressBar->setVisible(false);
+    m_inputBar->setVisible(false);  // Hide input once process is done
     
     if (status == QProcess::NormalExit && exitCode == 0) {
         m_success = true;
         m_statusLabel->setText("✅ Command completed successfully!");
         m_statusLabel->setStyleSheet("color: #a6e3a1;");
         
-        // Auto-close after success
         m_authBtn->setText("Done");
         m_authBtn->setEnabled(true);
         disconnect(m_authBtn, &QPushButton::clicked, this, &PrivilegedRunner::onAuthenticate);
@@ -262,6 +433,19 @@ void PrivilegedRunner::onProcessFinished(int exitCode, QProcess::ExitStatus stat
     }
     
     emit commandFinished(m_success);
+}
+
+void PrivilegedRunner::onSendInput() {
+    if (!m_process) return;
+    
+    if (m_process->state() == QProcess::Running) {
+        QString input = m_inputEdit->text() + "\n";
+        m_process->write(input.toUtf8());
+        m_inputEdit->clear();
+        
+        // No manual echo needed - the PTY/script command will echo the input back
+        // m_outputEdit->insertPlainText(input);
+    }
 }
 
 bool PrivilegedRunner::runCommand(const QString& command,

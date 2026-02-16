@@ -20,6 +20,169 @@ UpdateManager::UpdateManager(PackageManager* pm, QWidget* parent)
     , m_packageManager(pm)
 {
     setupUI();
+    // Apply initial theme
+    applyTheme(true);
+}
+
+void UpdateManager::applyTheme(bool isDark) {
+    QString bgColor = isDark ? "#1e1e2e" : "#eff1f5";
+    QString textColor = isDark ? "#cdd6f4" : "#4c4f69";
+    QString borderColor = isDark ? "#45475a" : "#ccd0da";
+    QString headerColor = isDark ? "#89b4fa" : "#1e66f5";
+    QString subTextColor = isDark ? "#a6adc8" : "#6c6f85";
+    QString inputBg = isDark ? "#313244" : "#e6e9ef";
+    QString buttonBg = isDark ? "#89b4fa" : "#1e66f5";
+    QString buttonText = isDark ? "#1e1e2e" : "#ffffff";
+    QString secButtonBg = isDark ? "#f9e2af" : "#df8e1d"; // Yellow/Orange
+    
+    // Header Title
+    QList<QLabel*> labels = this->findChildren<QLabel*>();
+    for(auto label : labels) {
+        if(label->text().contains("Update Manager")) {
+             label->setStyleSheet(QString("font-size: 24px; font-weight: bold; color: %1;").arg(headerColor));
+        } else if (label == m_statusLabel) {
+             label->setStyleSheet(QString("color: %1; font-size: 14px; font-weight: bold;").arg(subTextColor));
+        }
+    }
+    
+    // Buttons
+    QString mainBtnStyle = QString(R"(
+        QPushButton {
+            background-color: %1;
+            color: %2;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: %3;
+            color: %2;
+        }
+    )").arg(buttonBg, buttonText, isDark ? "#b4befe" : "#7287fd");
+    
+    QString secBtnStyle = QString(R"(
+        QPushButton {
+            background-color: %1;
+            color: %2;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: %3;
+        }
+    )").arg(secButtonBg, isDark ? "#1e1e2e" : "#ffffff", isDark ? "#f5c2e7" : "#ea76cb");
+    
+    // Note: m_historyBtn uses secondary style, others use main or different.
+    if(m_refreshBtn) m_refreshBtn->setStyleSheet(mainBtnStyle);
+    if(m_historyBtn) m_historyBtn->setStyleSheet(secBtnStyle);
+    
+    if(m_updateAllBtn) m_updateAllBtn->setStyleSheet(mainBtnStyle);
+    
+    QString actionBtnStyle = QString(R"(
+        QPushButton {
+            background-color: %1;
+            color: %2;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: bold;
+        }
+        QPushButton:hover {
+            background-color: %3;
+        }
+         QPushButton:disabled {
+            background-color: %4;
+            color: %5;
+        }
+    )").arg(
+        isDark ? "#a6e3a1" : "#40a02b", // Green
+        isDark ? "#1e1e2e" : "#ffffff",
+        isDark ? "#94e2d5" : "#179299", // Teal
+        isDark ? "#45475a" : "#ccd0da", // Disabled Bg
+        isDark ? "#6c7086" : "#9ca0b0"  // Disabled Text
+    );
+    if(m_updateSelectedBtn) m_updateSelectedBtn->setStyleSheet(actionBtnStyle);
+    
+    // Link/Text Buttons
+    QString textBtnStyle = QString("QPushButton { color: %1; border: none; font-weight: bold; background: transparent; } QPushButton:hover { text-decoration: underline; }").arg(headerColor);
+    if(m_selectAllBtn) m_selectAllBtn->setStyleSheet(textBtnStyle);
+    if(m_selectNoneBtn) m_selectNoneBtn->setStyleSheet(textBtnStyle);
+    
+    // Table
+    if(m_updatesTable) {
+        m_updatesTable->setStyleSheet(QString(R"(
+            QTableWidget {
+                background-color: %1;
+                alternate-background-color: %2;
+                color: %3;
+                border: 1px solid %4;
+                border-radius: 8px;
+                gridline-color: %4;
+                selection-background-color: %5;
+                selection-color: %6;
+            }
+            QHeaderView::section {
+                background-color: %2;
+                color: %3;
+                padding: 4px;
+                border: none;
+                border-bottom: 2px solid %4;
+                font-weight: bold;
+            }
+            QTableCornerButton::section {
+                background-color: %2;
+                border: none;
+                border-bottom: 2px solid %4;
+            }
+        )").arg(
+            bgColor, 
+            isDark ? "#313244" : "#e6e9ef", // Alt/Header
+            textColor, borderColor,
+            isDark ? "#45475a" : "#bcc0cc", // Selection Bg
+            textColor
+        ));
+    }
+    
+    // Changelog
+    if(m_changelogText) {
+        m_changelogText->setStyleSheet(QString(R"(
+            QTextEdit {
+                background-color: %1;
+                color: %2;
+                border: 2px solid %3;
+                border-radius: 8px;
+                padding: 10px;
+            }
+        )").arg(inputBg, textColor, borderColor));
+    }
+    
+    // GroupBoxes
+    QString groupStyle = QString(R"(
+        QGroupBox {
+            font-size: 16px;
+            font-weight: bold;
+            padding-top: 15px; /* Increased padding */
+            color: %1;
+            border: 2px solid %2;
+            border-radius: 8px;
+            margin-top: 20px; /* Increased margin */
+        }
+        QGroupBox::title {
+            subcontrol-origin: margin;
+            subcontrol-position: top left;
+            left: 10px;
+            padding: 0 5px;
+            background-color: transparent; /* Or matching background if needed */
+        }
+    )").arg(textColor, borderColor);
+    
+    QList<QGroupBox*> groups = this->findChildren<QGroupBox*>();
+    for (QGroupBox* group : groups) {
+        group->setStyleSheet(groupStyle);
+    }
 }
 
 void UpdateManager::setupUI() {
@@ -31,46 +194,22 @@ void UpdateManager::setupUI() {
     QHBoxLayout* headerLayout = new QHBoxLayout();
     
     QLabel* titleLabel = new QLabel("📦 Update Manager");
-    titleLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #89b4fa;");
+    // Style applied by applyTheme
     headerLayout->addWidget(titleLabel);
     
     headerLayout->addStretch();
     
     m_statusLabel = new QLabel("Click 'Check for Updates' to scan for available updates");
-    m_statusLabel->setStyleSheet("color: #a6adc8;");
+    // Style applied by applyTheme
     headerLayout->addWidget(m_statusLabel);
     
     m_refreshBtn = new QPushButton("🔄 Check for Updates");
-    m_refreshBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #89b4fa;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #b4befe;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_refreshBtn, &QPushButton::clicked, this, &UpdateManager::onRefresh);
     headerLayout->addWidget(m_refreshBtn);
     
     m_historyBtn = new QPushButton("📜 History");
-    m_historyBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #f9e2af;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: bold;
-        }
-        QPushButton:hover {
-            background-color: #f5c2e7;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_historyBtn, &QPushButton::clicked, this, &UpdateManager::onShowHistory);
     headerLayout->addWidget(m_historyBtn);
     
@@ -88,6 +227,7 @@ void UpdateManager::setupUI() {
     
     // Left: Updates table
     QGroupBox* updatesGroup = new QGroupBox("Available Updates");
+    // Style applied by applyTheme
     QVBoxLayout* updatesLayout = new QVBoxLayout(updatesGroup);
     
     // Selection buttons
@@ -115,45 +255,22 @@ void UpdateManager::setupUI() {
     m_updatesTable->setSelectionMode(QAbstractItemView::SingleSelection);
     m_updatesTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     connect(m_updatesTable, &QTableWidget::cellClicked, this, &UpdateManager::onUpdateClicked);
-    m_updatesTable->setStyleSheet(R"(
-        QTableWidget {
-            background-color: #1e1e2e;
-            border: 1px solid #45475a;
-            border-radius: 8px;
-        }
-        QTableWidget::item {
-            padding: 8px;
-        }
-        QTableWidget::item:selected {
-            background-color: #45475a;
-        }
-        QHeaderView::section {
-            background-color: #313244;
-            color: #cdd6f4;
-            padding: 8px;
-            border: none;
-        }
-    )");
+    // Style applied by applyTheme
     updatesLayout->addWidget(m_updatesTable);
     
     splitter->addWidget(updatesGroup);
     
     // Right: Changelog/details
     QGroupBox* detailsGroup = new QGroupBox("📋 What's New");
+    // Style applied by applyTheme
     QVBoxLayout* detailsLayout = new QVBoxLayout(detailsGroup);
     
     m_changelogText = new QTextEdit();
     m_changelogText->setReadOnly(true);
     m_changelogText->setPlaceholderText("Select a package to view changelog and dependency changes");
-    m_changelogText->setStyleSheet(R"(
-        QTextEdit {
-            background-color: #1e1e2e;
-            color: #cdd6f4;
-            border: 1px solid #45475a;
-            border-radius: 8px;
-            padding: 10px;
-        }
-    )");
+    // Style applied by applyTheme
+    m_changelogText->setPlaceholderText("Select a package to view changelog and dependency changes");
+    // Style applied by applyTheme
     detailsLayout->addWidget(m_changelogText);
     
     splitter->addWidget(detailsGroup);
@@ -168,48 +285,14 @@ void UpdateManager::setupUI() {
     m_updateSelectedBtn = new QPushButton("⬆️ Update Selected");
     m_updateSelectedBtn->setMinimumHeight(45);
     m_updateSelectedBtn->setEnabled(false);
-    m_updateSelectedBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #94e2d5;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 25px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        QPushButton:hover {
-            background-color: #a6e3a1;
-        }
-        QPushButton:disabled {
-            background-color: #45475a;
-            color: #6c7086;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_updateSelectedBtn, &QPushButton::clicked, this, &UpdateManager::onUpdateSelected);
     actionLayout->addWidget(m_updateSelectedBtn);
     
     m_updateAllBtn = new QPushButton("⬆️ Update All");
     m_updateAllBtn->setMinimumHeight(45);
     m_updateAllBtn->setEnabled(false);
-    m_updateAllBtn->setStyleSheet(R"(
-        QPushButton {
-            background-color: #a6e3a1;
-            color: #1e1e2e;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 25px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        QPushButton:hover {
-            background-color: #94e2d5;
-        }
-        QPushButton:disabled {
-            background-color: #45475a;
-            color: #6c7086;
-        }
-    )");
+    // Style applied by applyTheme
     connect(m_updateAllBtn, &QPushButton::clicked, this, &UpdateManager::onUpdateAll);
     actionLayout->addWidget(m_updateAllBtn);
     
@@ -227,92 +310,153 @@ void UpdateManager::onRefresh() {
     m_updates.clear();
     m_updatesTable->setRowCount(0);
     
-    // Run checkupdates in background
+    // Run checkupdates in background for official repos
     QProcess* proc = new QProcess(this);
     connect(proc, &QProcess::finished, this, [this, proc](int exitCode) {
-        m_progressBar->setVisible(false);
-        m_refreshBtn->setEnabled(true);
-        
         QString output = QString::fromUtf8(proc->readAllStandardOutput());
         proc->deleteLater();
         
-        if (output.trimmed().isEmpty()) {
-            m_statusLabel->setText("✅ System is up to date!");
-            m_updateAllBtn->setEnabled(false);
-            m_updateSelectedBtn->setEnabled(false);
-            return;
-        }
-        
         // Parse checkupdates output
-        QStringList lines = output.split('\n', Qt::SkipEmptyParts);
+        parseUpdatesOutput(output, false);
         
-        for (const QString& line : lines) {
-            // Format: package-name current-version -> new-version
-            QRegularExpression re(R"(^(\S+)\s+(\S+)\s+->\s+(\S+)$)");
-            QRegularExpressionMatch match = re.match(line.trimmed());
-            
-            if (match.hasMatch()) {
-                UpdateInfo info;
-                info.name = match.captured(1);
-                info.currentVersion = match.captured(2);
-                info.newVersion = match.captured(3);
-                info.selected = true;
-                
-                // Detect major version change (first digit changes)
-                QRegularExpression majorRe(R"(^(\d+))");
-                QRegularExpressionMatch currMatch = majorRe.match(info.currentVersion);
-                QRegularExpressionMatch newMatch = majorRe.match(info.newVersion);
-                info.isMajorUpdate = currMatch.hasMatch() && newMatch.hasMatch() &&
-                                     currMatch.captured(1) != newMatch.captured(1);
-                
-                // Flag potential security updates
-                info.isSecurityUpdate = info.name.contains("linux") || 
-                                        info.name.contains("openssl") ||
-                                        info.name.contains("gnutls") ||
-                                        info.name.contains("nss") ||
-                                        info.name.contains("ca-certificates");
-                
-                m_updates.append(info);
-            }
-        }
-        
-        m_statusLabel->setText(QString("📦 %1 update(s) available").arg(m_updates.size()));
-        m_updateAllBtn->setEnabled(!m_updates.isEmpty());
-        m_updateSelectedBtn->setEnabled(!m_updates.isEmpty());
-        
-        // Populate table
-        m_updatesTable->setRowCount(m_updates.size());
-        for (int i = 0; i < m_updates.size(); ++i) {
-            const UpdateInfo& info = m_updates[i];
-            
-            // Checkbox
-            QTableWidgetItem* checkItem = new QTableWidgetItem();
-            checkItem->setCheckState(Qt::Checked);
-            m_updatesTable->setItem(i, 0, checkItem);
-            
-            // Package name with flags
-            QString nameText = info.name;
-            if (info.isSecurityUpdate) nameText += " 🔒";
-            if (info.isMajorUpdate) nameText += " ⚠️";
-            QTableWidgetItem* nameItem = new QTableWidgetItem(nameText);
-            if (info.isSecurityUpdate) {
-                nameItem->setForeground(QColor("#f38ba8"));
-            } else if (info.isMajorUpdate) {
-                nameItem->setForeground(QColor("#f9e2af"));
-            }
-            m_updatesTable->setItem(i, 1, nameItem);
-            
-            // Versions
-            m_updatesTable->setItem(i, 2, new QTableWidgetItem(info.currentVersion));
-            m_updatesTable->setItem(i, 3, new QTableWidgetItem("→"));
-            
-            QTableWidgetItem* newItem = new QTableWidgetItem(info.newVersion);
-            newItem->setForeground(QColor("#a6e3a1"));
-            m_updatesTable->setItem(i, 4, newItem);
-        }
+        // Now check AUR updates — try yay first, then paru
+        m_statusLabel->setText("Checking AUR updates...");
+        checkAURUpdates();
     });
     
     proc->start("checkupdates");
+}
+
+void UpdateManager::parseUpdatesOutput(const QString& output, bool isAUR) {
+    if (output.trimmed().isEmpty()) return;
+    
+    QStringList lines = output.split('\n', Qt::SkipEmptyParts);
+    
+    for (const QString& line : lines) {
+        // Format: package-name current-version -> new-version
+        QRegularExpression re(R"(^(\S+)\s+(\S+)\s+->\s+(\S+)$)");
+        QRegularExpressionMatch match = re.match(line.trimmed());
+        
+        if (match.hasMatch()) {
+            UpdateInfo info;
+            info.name = match.captured(1);
+            info.currentVersion = match.captured(2);
+            info.newVersion = match.captured(3);
+            info.selected = true;
+            info.isAUR = isAUR;
+            
+            // Detect major version change (first digit changes)
+            QRegularExpression majorRe(R"(^(\d+))");
+            QRegularExpressionMatch currMatch = majorRe.match(info.currentVersion);
+            QRegularExpressionMatch newMatch = majorRe.match(info.newVersion);
+            info.isMajorUpdate = currMatch.hasMatch() && newMatch.hasMatch() &&
+                                 currMatch.captured(1) != newMatch.captured(1);
+            
+            // Flag potential security updates
+            info.isSecurityUpdate = !isAUR && (info.name.contains("linux") || 
+                                    info.name.contains("openssl") ||
+                                    info.name.contains("gnutls") ||
+                                    info.name.contains("nss") ||
+                                    info.name.contains("ca-certificates"));
+            
+            m_updates.append(info);
+        }
+    }
+}
+
+void UpdateManager::checkAURUpdates() {
+    // Try yay first
+    QProcess* aurProc = new QProcess(this);
+    connect(aurProc, &QProcess::finished, this, [this, aurProc](int exitCode) {
+        QString aurOutput = QString::fromUtf8(aurProc->readAllStandardOutput());
+        aurProc->deleteLater();
+        
+        if (exitCode != 0 && aurOutput.trimmed().isEmpty()) {
+            // yay not available, try paru
+            QProcess* paruProc = new QProcess(this);
+            connect(paruProc, &QProcess::finished, this, [this, paruProc](int exitCode) {
+                QString paruOutput = QString::fromUtf8(paruProc->readAllStandardOutput());
+                paruProc->deleteLater();
+                
+                parseUpdatesOutput(paruOutput, true);
+                finalizeUpdatesList();
+            });
+            paruProc->start("paru", {"-Qua"});
+            if (!paruProc->waitForStarted(2000)) {
+                paruProc->deleteLater();
+                finalizeUpdatesList();
+            }
+        } else {
+            parseUpdatesOutput(aurOutput, true);
+            finalizeUpdatesList();
+        }
+    });
+    aurProc->start("yay", {"-Qua"});
+    if (!aurProc->waitForStarted(2000)) {
+        aurProc->deleteLater();
+        // Neither yay nor paru — just finalize with repo updates only
+        finalizeUpdatesList();
+    }
+}
+
+void UpdateManager::finalizeUpdatesList() {
+    m_progressBar->setVisible(false);
+    m_refreshBtn->setEnabled(true);
+    
+    if (m_updates.isEmpty()) {
+        m_statusLabel->setText("✅ System is up to date!");
+        m_updateAllBtn->setEnabled(false);
+        m_updateSelectedBtn->setEnabled(false);
+        return;
+    }
+    
+    // Count repo vs AUR
+    int repoCount = 0, aurCount = 0;
+    for (const UpdateInfo& u : m_updates) {
+        if (u.isAUR) aurCount++; else repoCount++;
+    }
+    
+    QString statusText = QString("📦 %1 update(s) available").arg(m_updates.size());
+    if (aurCount > 0) {
+        statusText += QString(" (%1 repo, %2 AUR 🌐)").arg(repoCount).arg(aurCount);
+    }
+    m_statusLabel->setText(statusText);
+    m_updateAllBtn->setEnabled(true);
+    m_updateSelectedBtn->setEnabled(true);
+    
+    // Populate table
+    m_updatesTable->setRowCount(m_updates.size());
+    for (int i = 0; i < m_updates.size(); ++i) {
+        const UpdateInfo& info = m_updates[i];
+        
+        // Checkbox
+        QTableWidgetItem* checkItem = new QTableWidgetItem();
+        checkItem->setCheckState(Qt::Checked);
+        m_updatesTable->setItem(i, 0, checkItem);
+        
+        // Package name with flags
+        QString nameText = info.name;
+        if (info.isAUR) nameText += " 🌐";
+        if (info.isSecurityUpdate) nameText += " 🔒";
+        if (info.isMajorUpdate) nameText += " ⚠️";
+        QTableWidgetItem* nameItem = new QTableWidgetItem(nameText);
+        if (info.isSecurityUpdate) {
+            nameItem->setForeground(QColor("#f38ba8"));
+        } else if (info.isMajorUpdate) {
+            nameItem->setForeground(QColor("#f9e2af"));
+        } else if (info.isAUR) {
+            nameItem->setForeground(QColor("#cba6f7"));
+        }
+        m_updatesTable->setItem(i, 1, nameItem);
+        
+        // Versions
+        m_updatesTable->setItem(i, 2, new QTableWidgetItem(info.currentVersion));
+        m_updatesTable->setItem(i, 3, new QTableWidgetItem("→"));
+        
+        QTableWidgetItem* newItem = new QTableWidgetItem(info.newVersion);
+        newItem->setForeground(QColor("#a6e3a1"));
+        m_updatesTable->setItem(i, 4, newItem);
+    }
 }
 
 void UpdateManager::onUpdateClicked(int row, int column) {
@@ -385,24 +529,43 @@ void UpdateManager::onSelectNone() {
 }
 
 void UpdateManager::onUpdateSelected() {
-    QStringList selectedPackages;
+    QStringList repoPackages;
+    QStringList aurPackages;
     for (const UpdateInfo& info : m_updates) {
         if (info.selected) {
-            selectedPackages.append(info.name);
+            if (info.isAUR) {
+                aurPackages.append(info.name);
+            } else {
+                repoPackages.append(info.name);
+            }
         }
     }
     
-    if (selectedPackages.isEmpty()) {
+    if (repoPackages.isEmpty() && aurPackages.isEmpty()) {
         QMessageBox::information(this, "No Selection", "Please select packages to update.");
         return;
     }
     
-    QString command = QString("pacman -Syu %1 --noconfirm").arg(selectedPackages.join(" "));
+    bool success = true;
     
-    bool success = PrivilegedRunner::runCommand(
-        command,
-        QString("Updating %1 selected package(s)").arg(selectedPackages.size()),
-        this);
+    // Update repo packages with pacman
+    if (!repoPackages.isEmpty()) {
+        QString command = QString("pacman -S %1").arg(repoPackages.join(" "));
+        success = PrivilegedRunner::runCommand(
+            command,
+            QString("Updating %1 repo package(s)").arg(repoPackages.size()),
+            this);
+    }
+    
+    // Update AUR packages with yay/paru (no sudo needed)
+    if (success && !aurPackages.isEmpty()) {
+        QString aurHelper = QProcess().execute("which", {"yay"}) == 0 ? "yay" : "paru";
+        QString command = QString("%1 -S %2").arg(aurHelper, aurPackages.join(" "));
+        success = PrivilegedRunner::runCommand(
+            command,
+            QString("Updating %1 AUR package(s)").arg(aurPackages.size()),
+            this);
+    }
     
     if (success) {
         QMessageBox::information(this, "Success", "Packages updated successfully!");
@@ -420,8 +583,23 @@ void UpdateManager::onUpdateAll() {
     
     if (reply != QMessageBox::Yes) return;
     
+    // Check if any AUR packages exist — use yay/paru for full system update
+    bool hasAUR = false;
+    for (const UpdateInfo& u : m_updates) {
+        if (u.isAUR) { hasAUR = true; break; }
+    }
+    
+    QString command;
+    if (hasAUR) {
+        // yay/paru handles both repo + AUR updates
+        QString aurHelper = QProcess().execute("which", {"yay"}) == 0 ? "yay" : "paru";
+        command = aurHelper + " -Syu";
+    } else {
+        command = "pacman -Syu";
+    }
+    
     bool success = PrivilegedRunner::runCommand(
-        "pacman -Syu --noconfirm",
+        command,
         QString("Updating all %1 package(s)").arg(count),
         this);
     
